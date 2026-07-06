@@ -1,0 +1,2824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>2040 특화매장 분석자료 — 6월 Monthly (v3.2)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;background:#f8f8f6;color:#1a1a1a;font-size:14px;line-height:1.6;}
+.page{max-width:1100px;margin:0 auto;background:#fff;}
+
+/* ── 최상단 탭 ── */
+.top-tab-bar{background:#1a1a1a;display:flex;align-items:center;padding:0 36px;gap:4px;}
+.top-tab-btn{padding:14px 32px;font-size:14px;font-weight:600;color:rgba(255,255,255,.45);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .18s;letter-spacing:.02em;}
+.top-tab-btn.active{color:#fff;border-bottom-color:#1D9E75;background:rgba(255,255,255,.06);border-radius:4px 4px 0 0;}
+.top-tab-btn:hover:not(.active){color:rgba(255,255,255,.85);background:rgba(255,255,255,.05);border-radius:4px 4px 0 0;}
+.top-tab-panel{display:none;}
+.top-tab-panel.active{display:block;}
+.inner{padding:32px 40px;}
+
+/* 헤더 */
+.hd{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid #1a1a1a;margin-bottom:20px;}
+.hd-title{font-size:20px;font-weight:500;}
+.hd-ver{font-size:11px;font-weight:400;color:#aaa;margin-left:8px;}
+.hd-meta{font-size:11px;color:#999;text-align:right;line-height:1.8;}
+
+/* 섹션 */
+.sec{margin-bottom:40px;}
+.sec-hd{font-size:14px;font-weight:700;color:#333;letter-spacing:.01em;display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid #e8e8e8;}
+.sec-hd::after{content:none;}
+.sec-num{width:26px;height:26px;border-radius:50%;background:#1a1a1a;color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* 카드 */
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
+.how{font-size:12px;color:#555;background:#f8f8f6;border-radius:8px;padding:12px 16px;margin-bottom:18px;border-left:3px solid #e0e0e0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.how-item{padding:0 12px;}
+.how-item:not(:first-child){border-left:.5px solid #e0e0e0;}
+.how-lbl{font-size:11px;font-weight:500;color:#1D9E75;margin-bottom:4px;}
+.how-desc{font-size:12px;color:#555;line-height:1.7;}
+.dir-bar{font-size:11px;color:#666;background:#f0f8f4;border-radius:6px;padding:8px 14px;margin-bottom:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.dir-bar strong{color:#1a1a1a;font-size:12px;}
+
+/* KPI */
+.kpi-panel{background:linear-gradient(160deg,#eef8f3 0%,#e8f4fd 100%);border:1.5px solid #b8dece;border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.kpi-panel-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.kpi-badge{font-size:11px;font-weight:500;padding:2px 10px;border-radius:99px;}
+.kpi-panel-title{font-size:13px;font-weight:600;}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.kpi-card{background:#f8f8f6;border-radius:8px;padding:14px 16px;}
+.kpi-card-l{font-size:12px;color:#888;margin-bottom:6px;line-height:1.5;}
+.kpi-card-v{font-size:30px;font-weight:500;line-height:1;margin-bottom:8px;}
+.kpi-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.stag{font-size:12px;padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.stag-g{background:#EAF3DE;color:#3B6D11;}
+.stag-y{background:#FAEEDA;color:#854F0B;}
+.stag-r{background:#FCEBEB;color:#A32D2D;}
+
+/* 배지 */
+.tb{display:inline-flex;align-items:center;justify-content:center;min-width:70px;height:20px;border-radius:4px;font-size:10px;font-weight:500;padding:0 6px;}
+.t-exc{background:#EAF3DE;color:#3B6D11;}
+.t-grow{background:#E6F1FB;color:#185FA5;}
+.t-rcv{background:#F5F0E8;color:#5C4A1E;}
+.t-vis{background:#FFF9C4;color:#7A6800;}
+.t-lag{background:#FCEBEB;color:#A32D2D;}
+
+/* pill */
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;font-weight:600;}
+.pg{background:#EAF3DE;color:#3B6D11;} .py{background:#FAEEDA;color:#854F0B;} .pr{background:#FCEBEB;color:#A32D2D;}
+
+/* 탭 */
+.tab-hd{display:flex;border-bottom:1.5px solid #e0e0e0;margin-bottom:12px;}
+.tab-btn{padding:8px 20px;font-size:12px;font-weight:500;color:#aaa;background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;}
+.tab-btn.active{color:#1a1a1a;border-bottom-color:#1a1a1a;}
+.tab-btn:hover:not(.active){color:#555;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* note */
+.note{font-size:13px;color:#666;background:#f8f8f6;border-radius:6px;padding:10px 16px;margin-bottom:14px;line-height:1.8;}
+.note strong{color:#1a1a1a;font-weight:600;}
+
+/* 소형 차트 */
+.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.sm{background:#fafaf8;border:1px solid #ebebea;border-radius:8px;padding:12px 14px;min-width:0;overflow:hidden;}
+.sm-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.sm-name{font-size:12px;font-weight:600;}
+.sm-sig{font-size:11px;font-weight:500;margin-left:auto;}
+
+/* 유형 가이드 */
+.type-guide{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px;}
+.tg{border-radius:7px;padding:7px 10px;}
+.tgExc{background:#EAF3DE;} .tgGrow{background:#E6F1FB;} .tgLag{background:#FCEBEB;}
+.tg-hd{font-weight:500;font-size:12px;margin-bottom:2px;}
+.tgExc .tg-hd{color:#3B6D11;} .tgGrow .tg-hd{color:#185FA5;} .tgLag .tg-hd{color:#A32D2D;}
+.tg-dc{color:#555;line-height:1.5;font-size:11px;}
+
+/* 테이블 */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{font-size:12px;font-weight:600;color:#666;padding:9px 10px;border-bottom:2px solid #d8d8d8;text-align:center;white-space:nowrap;background:#fafaf8;}
+.tbl th:first-child{text-align:left;}
+.tbl td{padding:10px 10px;border-bottom:1px solid #efefef;text-align:center;vertical-align:middle;}
+.tbl td:first-child{text-align:left;font-weight:500;font-size:13px;}
+.tbl tbody tr:hover td{background:#f7f9ff;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+
+/* 활동 */
+.act-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.act-item{display:flex;gap:10px;padding:8px 10px;border:1px solid #f0f0f0;border-radius:8px;background:#fafaf8;}
+.act-left{flex-shrink:0;text-align:center;}
+.act-nm{font-weight:500;font-size:11px;color:#1a1a1a;margin-top:4px;}
+.act-tag{font-size:9px;padding:1px 6px;border-radius:99px;display:inline-block;margin:1px;}
+.toff{background:#E6F1FB;color:#185FA5;} .ton{background:#E1F5EE;color:#0F6E56;}
+.tev{background:#EEEDFE;color:#534AB7;} .tcare{background:#FAEEDA;color:#854F0B;}
+.act-desc{color:#555;line-height:1.5;font-size:11px;}
+
+/* lgd */
+.lgd{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#888;align-items:center;}
+.ldot{width:9px;height:9px;display:inline-block;margin-right:3px;border-radius:50%;}
+.lsq{width:9px;height:9px;display:inline-block;margin-right:3px;border-radius:2px;}
+
+/* 참고도표 */
+.ref-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.ref-tbl th{background:#f5f5f3;font-size:12px;font-weight:600;color:#555;padding:9px 10px;border:1px solid #e0e0e0;text-align:center;white-space:nowrap;}
+.ref-tbl th.tl{text-align:left;}
+.ref-tbl td{padding:9px 10px;border:.5px solid #efefef;text-align:center;font-size:13px;}
+.ref-tbl td.nc{text-align:left;font-weight:500;}
+.ref-tbl td.nc-skt{text-align:left;color:#aaa;}
+.ref-tbl .avg-r td{background:#f0f4f8;font-weight:500;}
+.ref-tbl .dir-r td{background:#f5f5f3;font-weight:500;}
+.ref-tbl .psm-r td{background:#f9fdfb;}
+.ref-sort{cursor:pointer;user-select:none;}
+.ref-sort:hover{color:#1a1a1a;}
+
+/* ── 분기탭 전용 스타일 ── */
+.q-intro{background:#f0f8f4;border-left:4px solid #1D9E75;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:24px;font-size:12px;color:#555;line-height:1.8;}
+.q-intro strong{color:#1a1a1a;font-size:13px;}
+.q-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.q-kpi{background:#f8f8f6;border:1px solid #e8e8e8;border-radius:10px;padding:16px 18px;}
+.q-kpi-l{font-size:11px;color:#888;margin-bottom:8px;line-height:1.5;}
+.q-kpi-v{font-size:26px;font-weight:500;color:#1a1a1a;line-height:1;margin-bottom:10px;}
+.q-kpi-sub{font-size:11px;color:#555;line-height:1.8;}
+/* 연령대 추이 그리드 */
+.age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.age-card{background:#fafaf8;border:1px solid #ebebea;border-radius:8px;padding:12px 14px;}
+.age-card-hd{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.age-card-name{font-size:12px;font-weight:600;}
+/* 활동-데이터 연결 카드 */
+.link-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+.link-card{border:1px solid #e8e8e8;border-radius:10px;padding:16px 18px;background:#fff;}
+.link-card-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0f0f0;}
+.link-store{font-size:13px;font-weight:600;}
+.link-type{font-size:11px;}
+.link-act{font-size:11px;color:#555;background:#f5f5f3;border-radius:5px;padding:7px 10px;margin-bottom:10px;line-height:1.6;}
+.link-act-lbl{font-size:10px;font-weight:500;color:#888;margin-bottom:3px;}
+.link-data{font-size:11px;}
+.link-data-lbl{font-size:10px;color:#888;margin-bottom:5px;font-weight:500;}
+.age-trend{display:flex;gap:4px;align-items:flex-end;margin-top:4px;}
+.age-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;}
+.age-bar-lbl{font-size:9px;color:#888;}
+.age-pill{font-size:10px;padding:1px 5px;border-radius:99px;}
+
+/* ── 심층진단 편집 ── */
+
+/* ── 섹션 목적 배너 ── */
+.purpose{border-radius:8px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px;}
+.purpose-core{background:#1a1a1a;color:#fff;}
+.purpose-sub{background:#f5f5f3;color:#555;border:1px solid #e8e8e8;}
+.purpose-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.purpose-body{flex:1;}
+.purpose-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;opacity:.6;}
+.purpose-core .purpose-label{color:#fff;}
+.purpose-sub .purpose-label{color:#888;}
+.purpose-title{font-size:14px;font-weight:700;line-height:1.4;}
+.purpose-core .purpose-title{color:#fff;}
+.purpose-sub .purpose-title{color:#1a1a1a;}
+.purpose-desc{font-size:12px;margin-top:3px;line-height:1.6;opacity:.8;}
+.purpose-core .purpose-desc{color:rgba(255,255,255,.8);}
+.purpose-sub .purpose-desc{color:#666;}
+.core-badge{display:inline-block;background:#1D9E75;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;letter-spacing:.04em;}
+.sub-badge{display:inline-block;background:#e8e8e6;color:#555;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;}
+
+/* ── 핵심/참고 구분 존 ── */
+.core-zone{background:linear-gradient(160deg,#eef8f3 0%,#e8f4fd 100%);border-radius:14px;padding:20px 22px;margin-bottom:6px;border:2px solid #b8dece;}
+.sub-zone{background:#f8f8f6;border-radius:14px;padding:20px 22px;border:1px solid #e4e4e2;margin-top:4px;}
+.zone-banner{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;}
+.zone-banner-core{border-bottom:2px solid #1D9E75;}
+.zone-banner-sub{border-bottom:1px solid #d4d4d2;}
+.zone-badge{border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;white-space:nowrap;}
+.zone-badge-core{background:#1D9E75;color:#fff;}
+.zone-badge-sub{background:#e4e4e2;color:#666;}
+.zone-banner-title{font-size:14px;font-weight:700;}
+.zone-banner-title-core{color:#1a6644;}
+.zone-banner-title-sub{color:#888;}
+.zone-banner-desc{font-size:12px;color:#aaa;margin-left:auto;}
+.edit-btn{background:none;border:1px solid #1D9E75;color:#1D9E75;border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;float:right;margin-left:8px;}
+.edit-btn:hover{background:#1D9E75;color:#fff;}
+.edit-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;}
+.edit-modal-overlay.open{display:flex;}
+.edit-modal{background:#fff;border-radius:12px;padding:24px;width:90%;max-width:680px;box-shadow:0 8px 40px rgba(0,0,0,.18);}
+.edit-modal-title{font-size:16px;font-weight:700;margin-bottom:14px;color:#1a1a1a;}
+.edit-modal textarea{width:100%;height:160px;border:1.5px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.7;font-family:inherit;resize:vertical;outline:none;}
+.edit-modal textarea:focus{border-color:#1D9E75;}
+.edit-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+.edit-save{background:#1D9E75;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;}
+.edit-save:hover{background:#178a65;}
+.edit-cancel{background:#f5f5f3;color:#555;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;}
+.edit-cancel:hover{background:#e8e8e6;}
+.trend-up{color:#3B6D11;font-weight:600;}
+#q-heatmap,#q-trend{min-width:200px;box-sizing:border-box;}
+.trend-dn{color:#A32D2D;font-weight:600;}
+.trend-nt{color:#888;}
+</style>
+</head>
+<body>
+
+<!-- ── 최상단 탭 ── -->
+<div class="top-tab-bar">
+  <button class="top-tab-btn active" onclick="swTopTab(0,this)">📅 분기 종합 (4~6월)</button>
+  <button class="top-tab-btn" onclick="swTopTab(1,this)">📊 6월 Monthly</button>
+  <div style="margin-left:auto;font-size:12px;color:rgba(255,255,255,.38);padding-right:8px;letter-spacing:.02em;">← 탭을 클릭하여 전환하세요</div>
+</div>
+
+<!-- ══════════════ 탭 0: 분기 종합 ══════════════ -->
+<div class="top-tab-panel active" id="ttp0">
+<div class="inner">
+
+<div class="hd">
+  <div><div class="hd-title">2040 특화매장 분석자료 — 2분기 종합 (4~6월)<span class="hd-ver">Clarity v3.2</span></div></div>
+  <div class="hd-meta">4월 마감 · 5월 마감 · 6월 마감(100%)<br>PS&amp;Marketing 유통인텔리전스팀</div>
+</div>
+
+<div class="q-intro">
+  <strong>분기 분석의 목적</strong><br>
+  4~6월 동안 진행한 매장별 활동이 <strong>연령대별 2040 내방 추이에 어떤 영향을 미쳤는지</strong> 확인하고, 하반기 개선 방향을 도출합니다.<br>
+</div>
+
+<div class="core-zone">
+<div class="zone-banner zone-banner-core"><span class="zone-badge zone-badge-core">★ 핵심</span><span class="zone-banner-title zone-banner-title-core">핵심 분석 — 현황 진단 + 매장별 활동 심층 진단</span><span class="zone-banner-desc">성장수준 · 흐름패턴 · 매장별 활동 심층진단</span></div>
+
+<div class="sec" style="margin-bottom:16px;">
+  <div class="sec-hd"><span class="sec-num">1</span>2040 내방 &amp; 구매 전체 현황 — 26년 4~6월 평균</div>
+  <div class="note" style="font-size:13px;"><strong>24년 평균比</strong> = 24년 월평균 대비 26년 4~6월 성장수준 &nbsp;/&nbsp; <strong>1Q比</strong> = 26년 1Q 대비 26년 4~6월 성장수준 <span style="color:#888;">(6월 마감 데이터 기준)</span></div>
+  <div style="overflow-x:auto;">
+  <table class="tbl" style="font-size:13px;width:100%;">
+    <thead>
+      <tr>
+        <th rowspan="2" style="text-align:left;background:#f5f5f3;min-width:200px;vertical-align:middle;">구분</th>
+        <th colspan="3" style="background:#EBF3FB;color:#2370B0;border-bottom:1.5px solid #B8D4EC;text-align:center;padding:7px;">2040 내방 (월평균, 명)</th>
+        <th colspan="3" style="background:#EAF5EF;color:#1A7A42;border-bottom:1.5px solid #A8D8B8;text-align:center;padding:7px;">2040 구매 (월평균, 명)</th>
+      </tr>
+      <tr>
+        <th style="background:#EBF3FB;color:#2370B0;text-align:center;white-space:nowrap;">4~6월 평균</th>
+        <th style="background:#EBF3FB;color:#2370B0;text-align:center;white-space:nowrap;">24년 평균比</th>
+        <th style="background:#EBF3FB;color:#2370B0;text-align:center;white-space:nowrap;">26년 1Q比</th>
+        <th style="background:#EAF5EF;color:#1A7A42;text-align:center;white-space:nowrap;">4~6월 평균</th>
+        <th style="background:#EAF5EF;color:#1A7A42;text-align:center;white-space:nowrap;">24년 평균比</th>
+        <th style="background:#EAF5EF;color:#1A7A42;text-align:center;white-space:nowrap;">26년 1Q比</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- SKT KPI 대상 매장 평균 — 새로 추가 -->
+      <tr style="background:#FFF0F3;border-top:2px solid #E8A0B0;border-bottom:1px solid #F0C0CC;">
+        <td style="font-size:13px;font-weight:600;">SKT KPI 대상 매장 평균 <span style="font-size:10px;color:#7B5CB8;margin-left:4px;font-weight:400;">(82店) (6/25 기준)</span></td>
+        <td style="text-align:center;font-weight:600;">250명</td>
+        <td style="text-align:center;"><span class="pill py">85.9%</span></td>
+        <td style="text-align:center;"><span class="pill pr">73.2%</span></td>
+        <td style="text-align:center;color:#bbb;">—</td>
+        <td style="text-align:center;color:#bbb;">—</td>
+        <td style="text-align:center;color:#bbb;">—</td>
+      </tr>
+      <!-- 31店 평균 — 배경 강조 -->
+      <tr style="background:#EEF5FF;border-top:2px solid #5A8FD4;border-bottom:1px solid #A8C8F0;">
+        <td style="font-size:13px;font-weight:600;">2040 특화매장(31店) 평균 <span style="font-size:10px;color:#7B5CB8;margin-left:4px;font-weight:400;">(6월 마감 기준)</span></td>
+        <td style="text-align:center;font-weight:600;">330명</td>
+        <td style="text-align:center;"><span class="pill pg">96.8%</span></td>
+        <td style="text-align:center;"><span class="pill py">77.2%</span></td>
+        <td style="text-align:center;font-weight:600;">37명</td>
+        <td style="text-align:center;"><span class="pill py">82.1%</span></td>
+        <td style="text-align:center;"><span class="pill py">71.0%</span></td>
+      </tr>
+      <!-- PS&M 9店 -->
+      <tr>
+        <td style="font-size:13px;padding-left:20px;">└ PS&amp;M 선정 매장(9店) 평균</td>
+        <td style="text-align:center;">287명</td>
+        <td style="text-align:center;"><span class="pill pg">94.8%</span></td>
+        <td style="text-align:center;"><span class="pill py">76.4%</span></td>
+        <td style="text-align:center;">34명</td>
+        <td style="text-align:center;"><span class="pill py">83.0%</span></td>
+        <td style="text-align:center;"><span class="pill py">71.5%</span></td>
+      </tr>
+      <!-- SKT 22店 -->
+      <tr>
+        <td style="font-size:13px;padding-left:20px;">└ SKT 선정 매장(22店) 평균</td>
+        <td style="text-align:center;">345명</td>
+        <td style="text-align:center;"><span class="pill pg">96.8%</span></td>
+        <td style="text-align:center;"><span class="pill py">77.0%</span></td>
+        <td style="text-align:center;">39명</td>
+        <td style="text-align:center;"><span class="pill py">81.8%</span></td>
+        <td style="text-align:center;"><span class="pill py">70.9%</span></td>
+      </tr>
+      <!-- 직영 평균 ★ 기준선 -->
+      <tr style="background:#f0f0ee;border-top:2px solid #aaa;border-bottom:2px solid #aaa;font-weight:700;">
+        <td style="font-size:13px;font-weight:700;background:#f0f0ee;">PS&amp;M 직영매장 평균 <span style="font-size:10px;color:#7B5CB8;margin-left:4px;font-weight:400;">(6월 마감 기준)</span></td>
+        <td style="text-align:center;background:#f0f0ee;">180명</td>
+        <td style="text-align:center;background:#f0f0ee;"><span class="pill py">87.4%</span></td>
+        <td style="text-align:center;background:#f0f0ee;"><span class="pill py">75.6%</span></td>
+        <td style="text-align:center;background:#f0f0ee;">22명</td>
+        <td style="text-align:center;background:#f0f0ee;"><span class="pill py">75.0%</span></td>
+        <td style="text-align:center;background:#f0f0ee;"><span class="pill py">71.1%</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div style="font-size:11px;color:#aaa;margin-top:6px;padding-left:2px;">※ 4~6월 평균 = 4~6월 합산 ÷ 3개월 / 24년 평균比 = 26년 4~6월 월평균 ÷ 24년 월평균</div>
+</div>
+
+<!-- ① 분기 KPI -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">2</span>4~6월 2040 내방변화<span class="core-badge">CORE</span></div>
+<div class="purpose purpose-core"><div class="purpose-icon">📊</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">지금 상황이 어떤가? — 성장수준과 흐름 패턴으로 현 위치를 진단합니다</div><div class="purpose-desc">24년 평균比·1Q比 두 기준으로 기초 체력과 최근 흐름을 동시에 확인. 직영 기준선(87.4% / 75.6%) 대비 어디 서 있는지가 핵심입니다.</div></div></div>
+  <div class="note">4·5·6월 2040 내방 3개월 평균값 기준 / <strong>24년 평균比 ≥ 100%</strong> = 절대성장(24년 대비 실질 성장) / <strong>1Q比 ≥ 100%</strong> = 1Q 수준 이상 성장 / <span style="color:#888;font-size:12px;">기준선: 회색 실선 100%</span></div>
+
+  <!-- 성장수준 관점 -->
+  <div style="background:#f8f8f6;border-radius:8px;padding:12px 16px;margin-bottom:14px;border-left:4px solid #1D9E75;">
+    <div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px;">📊 성장수준 관점 — 4~6월 합산 평균 기준</div>
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start;">
+      <div class="q-kpi-row" id="q-kpi-row" style="margin-bottom:0;"></div>
+      <div>
+        <div style="font-size:10px;color:#888;font-weight:600;margin-bottom:3px;">매장별 성장수준 그래프</div>
+        <div id="q-heatmap" style="width:100%;display:block;"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 290' style='width:100%;display:block;font-family:-apple-system,sans-serif;'>
+<rect width='340' height='290' fill='#fafaf8'/>
+<!-- 배경 구역 (직영기준선 기준 4분면) -->
+<rect x='52.0' y='180.9' width='105.8' height='57.1' fill='#FDE8E8' opacity='.5'/>
+<rect x='52.0' y='18.0' width='105.8' height='162.9' fill='#FAEADA' opacity='.5'/>
+<rect x='157.8' y='180.9' width='164.2' height='57.1' fill='#FAEADA' opacity='.5'/>
+<rect x='157.8' y='18.0' width='164.2' height='162.9' fill='#EEF5E8' opacity='.5'/>
+<!-- 직영 기준선 X=87.4% (녹색 점선) -->
+<line x1='157.8' y1='18' x2='157.8' y2='238' stroke='#1D9E75' stroke-width='1.8' stroke-dasharray='5,3'/>
+<!-- 직영 기준선 Y=75.6% (녹색 점선) -->
+<line x1='52' y1='180.9' x2='322' y2='180.9' stroke='#1D9E75' stroke-width='1.8' stroke-dasharray='5,3'/>
+<!-- 직영 기준선 라벨 -->
+<text x='157.8' y='250' text-anchor='middle' font-size='7.5' fill='#1D9E75' font-weight='700'>직영 평균</text><text x='157.8' y='260' text-anchor='middle' font-size='7.5' fill='#1D9E75' font-weight='700'>(87.4%)</text>
+<text x='47' y='177.9' text-anchor='end' font-size='7.5' fill='#1D9E75' font-weight='700'>직영 평균</text><text x='47' y='186.9' text-anchor='end' font-size='7.5' fill='#1D9E75' font-weight='700'>(75.6%)</text>
+<!-- 100% 기준선 (회색, 가늘게) -->
+<line x1='206.3' y1='18' x2='206.3' y2='238' stroke='rgba(0,0,0,.5)' stroke-width='1.6' stroke-dasharray='4,3'/>
+<line x1='52' y1='91.3' x2='322' y2='91.3' stroke='rgba(0,0,0,.5)' stroke-width='1.6' stroke-dasharray='4,3'/>
+<!-- X축 눈금 -->
+<line x1='90.6' y1='238' x2='90.6' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='90.6' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>70%</text>
+<line x1='129.1' y1='238' x2='129.1' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='129.1' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>80%</text>
+<line x1='167.7' y1='238' x2='167.7' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='167.7' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>90%</text>
+<line x1='206.3' y1='238' x2='206.3' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='206.3' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>100%</text>
+<line x1='244.9' y1='238' x2='244.9' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='244.9' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>110%</text>
+<line x1='283.4' y1='238' x2='283.4' y2='241' stroke='#ccc' stroke-width='.8'/>
+<text x='283.4' y='260' text-anchor='middle' font-size='8.5' fill='#bbb'>120%</text>
+<!-- Y축 눈금 -->
+<line x1='49' y1='201.3' x2='52' y2='201.3' stroke='#ccc' stroke-width='.8'/>
+<text x='47' y='204.3' text-anchor='end' font-size='8.5' fill='#bbb'>70%</text>
+<line x1='49' y1='164.7' x2='52' y2='164.7' stroke='#ccc' stroke-width='.8'/>
+<text x='47' y='167.7' text-anchor='end' font-size='8.5' fill='#bbb'>80%</text>
+<line x1='49' y1='128.0' x2='52' y2='128.0' stroke='#ccc' stroke-width='.8'/>
+<text x='47' y='131.0' text-anchor='end' font-size='8.5' fill='#bbb'>90%</text>
+<line x1='49' y1='91.3' x2='52' y2='91.3' stroke='#ccc' stroke-width='.8'/>
+<text x='47' y='94.3' text-anchor='end' font-size='8.5' fill='#bbb'>100%</text>
+<line x1='49' y1='54.7' x2='52' y2='54.7' stroke='#ccc' stroke-width='.8'/>
+<text x='47' y='57.7' text-anchor='end' font-size='8.5' fill='#bbb'>110%</text>
+<!-- 축 라벨 -->
+<text x='187.0' y='276' text-anchor='middle' font-size='9.5' fill='#666' font-weight='600'>24년 평균比 →</text>
+<text x='10' y='128.0' text-anchor='middle' font-size='9.5' fill='#666' font-weight='600' transform='rotate(-90,10,128.0)'>26년 1Q比 →</text>
+<!-- SKT 선정 매장 22개 (라벨 없이 작은 점만) -->
+<circle cx='251.7' cy='151.9' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='184.2' cy='180.5' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='322.0' cy='160.7' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='199.4' cy='150.5' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='157.0' cy='177.1' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='76.6' cy='131.9' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='322.0' cy='225.9' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='140.0' cy='192.7' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='197.9' cy='150.6' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='208.9' cy='172.0' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='236.8' cy='165.0' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='166.4' cy='208.7' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='182.3' cy='189.1' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='180.0' cy='210.2' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='160.1' cy='168.8' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='228.4' cy='183.2' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='168.0' cy='185.9' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='128.9' cy='145.5' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='168.5' cy='195.1' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='229.8' cy='139.0' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='182.3' cy='186.4' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<circle cx='217.4' cy='203.4' r='3' fill='#B0B0B0' stroke='#fff' stroke-width='.8' opacity='.6'/>
+<!-- PS&M 자체선정 매장 9개 (라벨 표시) -->
+<circle cx='285.4' cy='46.7' r='7' fill='#3B82F6' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='285.4' y1='46.7' x2='276.4' y2='38.7' stroke='#3B82F6' stroke-width='.6' opacity='.5'/>
+<text x='276.4' y='36.7' text-anchor='end' font-size='9' font-weight='700' fill='#3B82F6'>김포고촌역점</text>
+<circle cx='186.2' cy='210.1' r='7' fill='#F59E0B' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='186.2' y1='210.1' x2='177.2' y2='202.1' stroke='#F59E0B' stroke-width='.6' opacity='.5'/>
+<text x='177.2' y='200.1' text-anchor='end' font-size='9' font-weight='700' fill='#F59E0B'>배곧신도시점</text>
+<circle cx='182.9' cy='196.0' r='7' fill='#F59E0B' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='182.9' y1='196.0' x2='173.9' y2='188.0' stroke='#F59E0B' stroke-width='.6' opacity='.5'/>
+<text x='173.9' y='186.0' text-anchor='end' font-size='9' font-weight='700' fill='#F59E0B'>청라점</text>
+<circle cx='114.5' cy='183.9' r='7' fill='#F97316' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='114.5' y1='183.9' x2='105.5' y2='175.9' stroke='#F97316' stroke-width='.6' opacity='.5'/>
+<text x='105.5' y='173.9' text-anchor='end' font-size='9' font-weight='700' fill='#F97316'>신림역점</text>
+<circle cx='184.9' cy='161.6' r='7' fill='#F59E0B' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='184.9' y1='161.6' x2='192.5' y2='147.3' stroke='#F59E0B' stroke-width='.6' opacity='.5'/>
+<text x='192.5' y='145.3' text-anchor='end' font-size='9' font-weight='700' fill='#F59E0B'>춘천명동점</text>
+<circle cx='208.7' cy='143.3' r='7' fill='#1D9E75' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='208.7' y1='143.3' x2='199.7' y2='135.3' stroke='#1D9E75' stroke-width='.6' opacity='.5'/>
+<text x='199.7' y='133.3' text-anchor='end' font-size='9' font-weight='700' fill='#1D9E75'>서면롯데점</text>
+<circle cx='207.0' cy='205.4' r='7' fill='#1D9E75' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='207.0' y1='205.4' x2='216.0' y2='197.4' stroke='#1D9E75' stroke-width='.6' opacity='.5'/>
+<text x='216.0' y='195.4' font-size='9' font-weight='700' fill='#1D9E75'>다사점</text>
+<circle cx='159.0' cy='154.3' r='7' fill='#F59E0B' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='159.0' y1='154.3' x2='149.8' y2='164.0' stroke='#F59E0B' stroke-width='.6' opacity='.5'/>
+<text x='149.8' y='162.0' text-anchor='end' font-size='9' font-weight='700' fill='#F59E0B'>수완장덕점</text>
+<circle cx='281.6' cy='191.0' r='7' fill='#1D9E75' stroke='#fff' stroke-width='1.5' opacity='.9'/>
+<line x1='281.6' y1='191.0' x2='272.6' y2='183.0' stroke='#1D9E75' stroke-width='.6' opacity='.5'/>
+<text x='272.6' y='181.0' text-anchor='end' font-size='9' font-weight='700' fill='#1D9E75'>탕정점</text>
+</svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 방향성 패턴 -->
+  <div style="background:#f8f8f6;border-radius:8px;padding:12px 16px;border-left:4px solid #854F0B;">
+    <div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px;">📈 4→5→6월 흐름 패턴 — 2040 내방 실수(명) 월별 증감 기준</div>
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start;">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-card-l" style="color:#3B6D11;font-size:12px;font-weight:600;">꾸준 성장 (매달↑)</div>
+          <div class="kpi-card-v" style="color:#3B6D11;font-size:24px;">1店</div>
+          <div class="kpi-card-tags"><span class="stag stag-g">김포고촌역점 202→211→232명</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-l" style="color:#854F0B;font-size:12px;font-weight:600;">반등형 (5월↓ 후 6월↑)</div>
+          <div class="kpi-card-v" style="color:#854F0B;font-size:24px;">3店</div>
+          <div class="kpi-card-tags">
+            <span class="stag stag-y">배곧신도시점 228→225→271</span><span class="stag stag-y">수완장덕점 326→318→450</span>
+            <span class="stag stag-y">탕정점 277→264→359</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-l" style="color:#A32D2D;font-size:12px;font-weight:600;">하락·정체형</div>
+          <div class="kpi-card-v" style="color:#A32D2D;font-size:24px;">5店</div>
+          <div class="kpi-card-tags">
+            <span class="stag stag-r">신림역점 300→235→282 ↘↗</span><span class="stag stag-r">춘천명동점 160→137→154 ↘↗</span>
+            <span class="stag stag-r">청라점 348→326→354 ↘↗</span><span class="stag stag-r">다사점 283→242→289 ↘↗</span>
+            <span class="stag stag-r">서면롯데점 504→444→491 ↘↗</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:#888;font-weight:600;margin-bottom:3px;">9개 매장 4→5→6월 추이</div>
+        <div id="q-trend" style="width:100%;display:block;"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 570 220' style='width:100%;display:block;font-family:-apple-system,sans-serif;'>
+<rect width='570' height='220' fill='#fafaf8'/>
+<line x1='38' y1='193.7' x2='435' y2='193.7' stroke='rgba(0,0,0,.07)' stroke-width='.8'/>
+<text x='34' y='197.7' text-anchor='end' font-size='8.5' fill='#bbb'>120</text>
+<line x1='38' y1='147.6' x2='435' y2='147.6' stroke='rgba(0,0,0,.07)' stroke-width='.8'/>
+<text x='34' y='151.6' text-anchor='end' font-size='8.5' fill='#bbb'>230</text>
+<line x1='38' y1='105.7' x2='435' y2='105.7' stroke='rgba(0,0,0,.07)' stroke-width='.8'/>
+<text x='34' y='109.7' text-anchor='end' font-size='8.5' fill='#bbb'>330</text>
+<line x1='38' y1='59.7' x2='435' y2='59.7' stroke='rgba(0,0,0,.07)' stroke-width='.8'/>
+<text x='34' y='63.7' text-anchor='end' font-size='8.5' fill='#bbb'>440</text>
+<line x1='38' y1='17.8' x2='435' y2='17.8' stroke='rgba(0,0,0,.07)' stroke-width='.8'/>
+<text x='34' y='21.8' text-anchor='end' font-size='8.5' fill='#bbb'>540</text>
+<text x='38.0' y='214' text-anchor='middle' font-size='9.5' fill='#666'>4월</text>
+<text x='236.5' y='214' text-anchor='middle' font-size='9.5' fill='#666'>5월</text>
+<text x='435.0' y='214' text-anchor='middle' font-size='9.5' fill='#666'>6월</text>
+<polyline points='38.0,159.3 236.5,155.6 435.0,146.8' fill='none' stroke='#3B82F6' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='159.3' r='3.5' fill='#3B82F6' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='155.6' r='3.5' fill='#3B82F6' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='146.8' r='3.5' fill='#3B82F6' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,127.9 236.5,133.4 435.0,93.6' fill='none' stroke='#1D9E75' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='127.9' r='3.5' fill='#1D9E75' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='133.4' r='3.5' fill='#1D9E75' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='93.6' r='3.5' fill='#1D9E75' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,148.4 236.5,149.7 435.0,130.4' fill='none' stroke='#F59E0B' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='148.4' r='3.5' fill='#F59E0B' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='149.7' r='3.5' fill='#F59E0B' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='130.4' r='3.5' fill='#F59E0B' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,107.4 236.5,110.8 435.0,55.5' fill='none' stroke='#9B59B6' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='107.4' r='3.5' fill='#9B59B6' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='110.8' r='3.5' fill='#9B59B6' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='55.5' r='3.5' fill='#9B59B6' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,32.9 236.5,58.0 435.0,38.3' fill='none' stroke='#22C55E' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='32.9' r='3.5' fill='#22C55E' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='58.0' r='3.5' fill='#22C55E' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='38.3' r='3.5' fill='#22C55E' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,125.4 236.5,142.6 435.0,122.9' fill='none' stroke='#E67E22' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='125.4' r='3.5' fill='#E67E22' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='142.6' r='3.5' fill='#E67E22' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='122.9' r='3.5' fill='#E67E22' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,118.3 236.5,145.5 435.0,125.8' fill='none' stroke='#F97316' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='118.3' r='3.5' fill='#F97316' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='145.5' r='3.5' fill='#F97316' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='125.8' r='3.5' fill='#F97316' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,176.9 236.5,186.5 435.0,179.4' fill='none' stroke='#64748B' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='176.9' r='3.5' fill='#64748B' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='186.5' r='3.5' fill='#64748B' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='179.4' r='3.5' fill='#64748B' stroke='#fff' stroke-width='1.5'/>
+<polyline points='38.0,98.2 236.5,107.4 435.0,95.7' fill='none' stroke='#D946EF' stroke-width='2.2' stroke-linejoin='round'/>
+<circle cx='38.0' cy='98.2' r='3.5' fill='#D946EF' stroke='#fff' stroke-width='1.5'/>
+<circle cx='236.5' cy='107.4' r='3.5' fill='#D946EF' stroke='#fff' stroke-width='1.5'/>
+<circle cx='435.0' cy='95.7' r='3.5' fill='#D946EF' stroke='#fff' stroke-width='1.5'/>
+<line x1='436' y1='38.3' x2='440.0' y2='38.3' stroke='#22C55E' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='42.3' font-size='9' font-weight='700' fill='#22C55E'>서면롯데점 491</text>
+<line x1='436' y1='55.5' x2='440.0' y2='55.5' stroke='#9B59B6' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='59.5' font-size='9' font-weight='700' fill='#9B59B6'>수완장덕점 450</text>
+<line x1='436' y1='93.6' x2='440.0' y2='93.6' stroke='#1D9E75' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='97.6' font-size='9' font-weight='700' fill='#1D9E75'>탕정점 359</text>
+<line x1='436' y1='106.6' x2='440.0' y2='106.6' stroke='#D946EF' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='110.6' font-size='9' font-weight='700' fill='#D946EF'>청라점 354</text>
+<line x1='436' y1='122.9' x2='440.0' y2='122.9' stroke='#E67E22' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='126.9' font-size='9' font-weight='700' fill='#E67E22'>다사점 289</text>
+<line x1='436' y1='135.9' x2='440.0' y2='135.9' stroke='#F97316' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='139.9' font-size='9' font-weight='700' fill='#F97316'>신림역점 282</text>
+<line x1='436' y1='148.9' x2='440.0' y2='148.9' stroke='#F59E0B' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='152.9' font-size='9' font-weight='700' fill='#F59E0B'>배곧신도시점 271</text>
+<line x1='436' y1='161.9' x2='440.0' y2='161.9' stroke='#3B82F6' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='165.9' font-size='9' font-weight='700' fill='#3B82F6'>김포고촌역점 232</text>
+<line x1='436' y1='179.4' x2='440.0' y2='179.4' stroke='#64748B' stroke-width='.8' stroke-dasharray='2,1'/>
+<text x='442' y='183.4' font-size='9' font-weight='700' fill='#64748B'>춘천명동점 154</text>
+</svg></div></svg></div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- ② 단골 Quality 섹션 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num" style="background:#854F0B;">3</span>단골 내방 Quality 현황 — 26년 4~6월 합산 기준
+    <span style="font-size:11px;font-weight:400;color:#888;margin-left:8px;">단골 내방의 질적 수준을 진단합니다</span>
+  </div>
+  <div class="purpose purpose-sub" style="margin-bottom:12px;">
+    <div class="purpose-icon">🏅</div>
+    <div class="purpose-body">
+      <div class="purpose-label">이 섹션의 역할</div>
+      <div class="purpose-title">단골이 진짜 오고 있나? — 단골 비중과 연계내방율로 내방의 질(Quality)을 확인합니다</div>
+      <div class="purpose-desc" style="line-height:2.0;">
+        <strong>단골내방 비중</strong> = 단골내방객 / 전 연령 신내방객<br>
+        <strong>연계내방율</strong> = 단골 MMS를 받고 14일 이내 매장 내방한 고객 비중 (연계내방 / 신내방객)
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;border:1.5px solid #e0e0e0;border-radius:10px;overflow:hidden;">
+    <div style="background:#1a1a1a;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;">📌 매장별 단골 Quality 해석</div>
+    <div style="padding:14px 16px;display:grid;gap:10px;">
+      <div style="border-left:3px solid #3B82F6;padding:10px 14px;background:#f0f6ff;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">🏆 김포고촌역점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">문자를 받고 방문하는 단골 비중이 증가세로, 현재의 단골 풀(Pool)을 기반으로 실제 내방 증대로 이어진 효과로 추정됩니다. 단골 관리의 선순환이 작동 중입니다.</div>
+      </div>
+      <div style="border-left:3px solid #1D9E75;padding:10px 14px;background:#f0f8f4;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">📈 탕정점 · 서면롯데점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">단골내방 비중은 소폭 감소하거나 유지되었으나, 문자 수신 후 내방 비중(연계내방율)은 오히려 증가했습니다. 단골 대상 내방 전환율을 높이는 동시에 비단골(신규 고객) 유입도 함께 늘어난 것으로 유추됩니다.</div>
+      </div>
+      <div style="border-left:3px solid #F59E0B;padding:10px 14px;background:#fffbf0;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">⚖️ 수완장덕점 · 다사점 · 춘천명동점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">단골 내방 비중이 직영 평균과 유사하거나 상회하고 연계내방율도 증가했습니다. 단골 내방 관리는 충분히 이루어지고 있으므로 향후에는 비단골 대상 2040 신규 유입 확대에 집중할 필요가 있습니다.</div>
+      </div>
+      <div style="border-left:3px solid #E67E22;padding:10px 14px;background:#fff8f0;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">📩 배곧신도시점 · 청라점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">연계내방율이 감소했습니다. 문자 발송을 통한 단골 내방 유도 여지가 충분하므로 MMS 발송 빈도 및 메시지 효과를 점검하고 활동을 강화할 필요가 있습니다.</div>
+      </div>
+      <div style="border-left:3px solid #F97316;padding:10px 14px;background:#fff5f0;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">⚠️ 신림역점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">단골내방 비중과 연계내방율 모두 직영 평균을 하회하고 있습니다. 2040 단골 대상 적극적인 내방 유도 활동이 우선 필요하며 MMS 활용 및 단골 접점 강화를 집중 점검해야 합니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+  <table class="tbl" style="font-size:13px;width:100%;">
+    <thead>
+      <tr>
+        <th rowspan="2" style="text-align:left;background:#f5f5f3;min-width:110px;vertical-align:middle;">매장</th>
+        <th colspan="2" style="background:#F0F4FF;color:#3355AA;border-bottom:1.5px solid #C0CCF0;text-align:center;">신내방객</th>
+        <th colspan="5" style="background:#FFF3E8;color:#854F0B;border-bottom:1.5px solid #F0C898;text-align:center;">단골내방객 비중 (전체 내방 대비)</th>
+        <th colspan="5" style="background:#EAF0FF;color:#3355AA;border-bottom:1.5px solid #B0C4F0;text-align:center;">연계내방율 (문자→내방 전환)</th>
+      </tr>
+      <tr>
+        <th style="background:#F0F4FF;color:#3355AA;text-align:center;">4~6월 평균</th>
+        <th style="background:#F0F4FF;color:#3355AA;text-align:center;">24년 평균比</th>
+        <th style="background:#FFF3E8;color:#854F0B;text-align:center;">4~6월 비중</th>
+        <th style="background:#FFF3E8;color:#854F0B;text-align:center;">24년 평균</th>
+        <th style="background:#FFF3E8;color:#854F0B;text-align:center;">26년 1Q</th>
+        <th style="background:#FFF3E8;color:#854F0B;text-align:center;">'24년 평균 대비 Gap</th>
+        <th style="background:#FFF3E8;color:#854F0B;text-align:center;">'26년 1Q 대비 Gap</th>
+        <th style="background:#EAF0FF;color:#3355AA;text-align:center;">4~6월 연계율</th>
+        <th style="background:#EAF0FF;color:#3355AA;text-align:center;">24년 평균</th>
+        <th style="background:#EAF0FF;color:#3355AA;text-align:center;">26년 1Q</th>
+        <th style="background:#EAF0FF;color:#3355AA;text-align:center;">'24년 평균 대비 Gap</th>
+        <th style="background:#EAF0FF;color:#3355AA;text-align:center;">'26년 1Q 대비 Gap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#F0F4F8;border-bottom:2px solid #aaa;">
+        <td style="font-size:12px;font-weight:700;color:#444;">직영 평균</td>
+        <td style="text-align:center;font-weight:600;color:#444;">575명</td>
+        <td style="text-align:center;font-weight:600;color:#444;">103.8%</td>
+        <td style="text-align:center;font-weight:700;color:#444;background:#E8F0FB;">64.4%</td>
+        <td style="text-align:center;color:#888;">65.7%</td>
+        <td style="text-align:center;color:#888;">62.9%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△1.3%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.5%p</td>
+        <td style="text-align:center;font-weight:700;color:#444;background:#E8F0FB;">50.7%</td>
+        <td style="text-align:center;color:#888;">49.7%</td>
+        <td style="text-align:center;color:#888;">49.3%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.0%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.4%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">춘천명동점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">438명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">110.0%</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">71.0%</td>
+        <td style="text-align:center;color:#888;">71.4%</td>
+        <td style="text-align:center;color:#888;">69.0%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△0.4%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.9%p</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">55.7%</td>
+        <td style="text-align:center;color:#888;">55.9%</td>
+        <td style="text-align:center;color:#888;">54.8%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△0.3%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+0.8%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">다사점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">988명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">138.2%</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">67.0%</td>
+        <td style="text-align:center;color:#888;">63.8%</td>
+        <td style="text-align:center;color:#888;">65.1%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+3.2%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.8%p</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">54.3%</td>
+        <td style="text-align:center;color:#888;">47.4%</td>
+        <td style="text-align:center;color:#888;">47.2%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+6.9%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+7.1%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">김포고촌역점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">603명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">127.3%</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">67.5%</td>
+        <td style="text-align:center;color:#888;">62.1%</td>
+        <td style="text-align:center;color:#888;">61.6%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+5.3%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+5.8%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">50.1%</td>
+        <td style="text-align:center;color:#888;">45.6%</td>
+        <td style="text-align:center;color:#888;">45.6%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.5%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.5%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">배곧신도시점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">606명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">108.7%</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">67.2%</td>
+        <td style="text-align:center;color:#888;">65.3%</td>
+        <td style="text-align:center;color:#888;">69.9%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.9%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△2.7%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">47.4%</td>
+        <td style="text-align:center;color:#888;">48.7%</td>
+        <td style="text-align:center;color:#888;">50.0%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△1.4%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△2.6%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">수완장덕점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">893명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">91.5%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">63.6%</td>
+        <td style="text-align:center;color:#888;">65.8%</td>
+        <td style="text-align:center;color:#888;">63.4%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△2.2%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+0.3%p</td>
+        <td style="text-align:center;color:#3B6D11;font-weight:700;background:#E8F5E9;">53.7%</td>
+        <td style="text-align:center;color:#888;">51.1%</td>
+        <td style="text-align:center;color:#888;">51.0%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+2.7%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+2.7%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">청라점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">827명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">103.7%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">61.6%</td>
+        <td style="text-align:center;color:#888;">65.3%</td>
+        <td style="text-align:center;color:#888;">59.7%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△3.7%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+1.9%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">43.1%</td>
+        <td style="text-align:center;color:#888;">47.0%</td>
+        <td style="text-align:center;color:#888;">44.5%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△3.9%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△1.4%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">서면롯데점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">1581명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">103.9%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">61.8%</td>
+        <td style="text-align:center;color:#888;">61.4%</td>
+        <td style="text-align:center;color:#888;">62.1%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+0.4%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△0.3%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">50.2%</td>
+        <td style="text-align:center;color:#888;">46.3%</td>
+        <td style="text-align:center;color:#888;">47.0%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.0%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+3.2%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">신림역점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">750명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">94.9%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">58.5%</td>
+        <td style="text-align:center;color:#888;">56.1%</td>
+        <td style="text-align:center;color:#888;">53.7%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+2.4%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.8%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">45.7%</td>
+        <td style="text-align:center;color:#888;">41.1%</td>
+        <td style="text-align:center;color:#888;">42.2%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.5%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+3.5%p</td>
+      </tr>
+      <tr>
+        <td style="font-size:12px;font-weight:600;">탕정점</td>
+        <td style="text-align:center;font-size:12px;color:#555;">687명</td>
+        <td style="text-align:center;font-size:12px;color:#555;font-weight:600;">144.8%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">57.1%</td>
+        <td style="text-align:center;color:#888;">58.0%</td>
+        <td style="text-align:center;color:#888;">60.2%</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△0.9%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;">△3.2%p</td>
+        <td style="text-align:center;color:#A32D2D;font-weight:700;background:#FDECEC;">40.4%</td>
+        <td style="text-align:center;color:#888;">34.6%</td>
+        <td style="text-align:center;color:#888;">36.3%</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+5.7%p</td>
+        <td style="text-align:center;color:#185FA5;font-weight:700;">+4.0%p</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:16px;font-size:12px;color:#888;flex-wrap:wrap;">
+    <span>💡 <strong>단골비중 ↑</strong> = 신규보다 재방문 고객이 더 많음 (충성도 높음)</span>
+    <span>💡 <strong>연계내방율 ↑</strong> = MMS 발송 후 실제 방문으로 전환되는 비율이 높음 (문자 효과 有)</span>
+    <span>💡 기준: 단골비중 직영평균 <strong>64.4%</strong> · 연계내방율 직영평균 <strong>50.7%</strong> &nbsp;|&nbsp; <span style="display:inline-block;background:#E8F5E9;border-radius:4px;padding:1px 6px;font-size:11px;">■ 초록</span> = 직영 평균 초과 &nbsp;<span style="display:inline-block;background:#FDECEC;border-radius:4px;padding:1px 6px;font-size:11px;">■ 빨강</span> = 직영 평균 미만</span>
+    <span style="color:#aaa;">※ 6월 예상마감 포함 4~6월 합산 기준</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ④ 매장별 2040 내방/성장 추이 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">4</span>매장별 2040 내방 / 성장 추이<span class="sub-badge">참고</span></div>
+<div class="purpose purpose-sub"><div class="purpose-icon">📈</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">전체가 올랐나, 2040만 올랐나? — 내방 성장의 질을 확인합니다</div><div class="purpose-desc">전체 내방(파랑)과 2040 내방(주황)의 방향이 다르면 타겟 이탈 신호입니다. 두 지표가 함께 우상단에 있어야 건강한 성장입니다.</div></div></div>
+
+  <div style="margin-top:18px;border:1.5px solid #e0e0e0;border-radius:10px;overflow:hidden;">
+    <div style="background:#1a1a1a;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;">📌 전체 vs 2040 내방 추이 해석</div>
+    <div style="padding:14px 16px;display:grid;gap:10px;">
+      <div style="border-left:3px solid #1D9E75;padding:10px 14px;background:#f0f8f4;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">📈 김포고촌역점 · 탕정점 · 서면롯데점 · 다사점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">24년 평균 대비 전체 내방객이 증가하는 동시에 2040 내방객도 함께 늘었습니다. 2040 타겟 유입 전략이 효과적으로 작동 중인 그룹입니다.</div>
+      </div>
+      <div style="border-left:3px solid #F59E0B;padding:10px 14px;background:#fffbf0;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">⚖️ 배곧신도시점 · 청라점 · 춘천명동점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">24년 평균 대비 전체 연령대 내방은 증가했으나 2040 내방객은 같은 수준으로 증가하지 못했습니다. 전체 성장이 2040 외 연령대에 편중되어 있어 2040 타겟 유입 강화가 필요합니다.</div>
+      </div>
+      <div style="border-left:3px solid #F97316;padding:10px 14px;background:#fff5f0;border-radius:0 8px 8px 0;">
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">⚠️ 수완장덕점 · 신림역점</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;">전체 내방객과 2040 내방객 모두 24년 평균에 미치지 못합니다. 2040 타겟팅에 앞서 전반적인 내방 유입 자체를 늘리는 기본 접점 활동이 시급합니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tab-hd">
+      <button class="tab-btn active" onclick="swTab('q',0,this)">성장 수준 추이 (사분면)</button>
+      <button class="tab-btn" onclick="swTab('q',1,this)">전체 vs 2040 내방 월별 추이</button>
+    </div>
+    <!-- 사분면 탭 (기본) -->
+    <div class="tab-panel active" id="qtp0">
+      <div class="note" style="font-size:13px;"><strong>X축</strong> 24년 평균比 (분기 평균) / <strong>Y축</strong> 26년 1Q比 (분기 평균) / 점선 = 성장수준 100% / <span style="color:#378ADD;">● 파랑=전체내방</span> / <span style="color:#D85A30;">■ 주황=2040내방</span></div>
+      <div class="lgd" style="margin-bottom:10px;">
+        <span><span class="ldot" style="background:#378ADD;"></span>전체내방 (원)</span><span><span class="lsq" style="background:#D85A30;width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;"></span>2040내방 (사각) — 분기 4~6월 평균 기준</span>
+        <span style="margin-left:auto;font-size:11px;color:#aaa;">점선 = 직영 평균 기준선</span>
+      </div>
+      <div class="sg3" id="qsg1"></div>
+    </div>
+    <!-- 전체 vs 2040 탭 -->
+    <div class="tab-panel" id="qtp1">
+      <div class="note"><strong>막대</strong> = 전체내방 / <strong style="color:#D85A30;">꺾은선</strong> = 2040내방. Y축 동일 스케일로 표시.</div>
+      <div class="lgd" style="margin-bottom:10px;">
+        <span><span class="lsq" style="background:rgba(56,138,221,.6);width:14px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;"></span><strong>막대</strong> 전체 내방 (명)</span>
+        <span><span style="display:inline-block;width:18px;height:2.5px;background:#D85A30;vertical-align:middle;margin-right:5px;border-radius:1px;"></span><strong style="color:#D85A30;">꺾은선</strong> 2040 내방 (명)</span>
+        <span style="font-size:11px;color:#aaa;margin-left:auto;">Y축 동일 스케일 적용</span>
+      </div>
+      <div class="sg3" id="qsg0"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ② 매장별 심층 진단 -->
+<div class="sec">
+  <div class="sec-hd" style="display:flex;align-items:center;gap:10px;">
+    <span class="sec-num">5</span>매장별 활동 심층 진단<span class="core-badge">CORE</span>
+    <button id="save-html-btn" onclick="saveAsHTML()" style="margin-left:auto;background:#1D9E75;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;">
+      💾 키워드 저장 (HTML 다운로드)
+    </button>
+  </div>
+<div class="purpose purpose-core"><div class="purpose-icon">🔍</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">왜 이런 결과가 나왔나? — 활동 내용이 내방 변화로 이어졌는지 직접 연결합니다</div><div class="purpose-desc">①에서 확인한 숫자의 원인을 여기서 찾습니다. 어떤 활동이 어떤 연령대를 움직였는지, 그리고 무엇이 부족했는지를 매장별로 확인하세요.</div></div></div>
+  <div class="note" style="font-size:13px;">각 매장의 4~6월 주요 활동과 연령대별 내방 변화를 연계 분석합니다. 숫자 = 4월 / 5월 / 6월 내방 수(명). 심층 진단 텍스트는 ✏️ 버튼으로 직접 수정 가능합니다.</div>
+  <div class="link-grid" id="link-grid"></div>
+</div>
+
+</div><!-- /core-zone -->
+<div style="display:flex;align-items:center;gap:14px;margin:22px 0 14px;"><div style="flex:1;height:2px;background:linear-gradient(to right,#1D9E75 0%,#e0e0e0 100%);border-radius:1px;"></div><span style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:.1em;white-space:nowrap;text-transform:uppercase;">참고 분석 ⑤ — ⑧</span><div style="flex:1;height:2px;background:linear-gradient(to left,#1D9E75 0%,#e0e0e0 100%);border-radius:1px;"></div></div>
+<div class="sub-zone">
+<div class="zone-banner zone-banner-sub"><span class="zone-badge zone-badge-sub">참고</span><span class="zone-banner-title zone-banner-title-sub">⑥~⑧ 현재 수준을 다각도로 확인합니다</span><span class="zone-banner-desc">포지셔닝 · 성장추이 · 유형분류 · 전체현황</span></div>
+
+
+<!-- ③ 4분면 포지셔닝 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">6</span>4분면 포지셔닝 — 분기(4~6월) 합산 기준<span class="sub-badge">참고</span></div>
+<div class="purpose purpose-sub"><div class="purpose-icon">🗺️</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">TF 안에서 우리 매장은 지금 어디에 있나? — 9개 매장의 상대적 위치를 한눈에 확인합니다</div><div class="purpose-desc">X축(24년 평균比)은 기초 체력, Y축(1Q比)은 최근 흐름. 우상단이 목표, 좌하단일수록 회복이 시급합니다.</div></div></div>
+  <div class="card">
+    <div class="note" style="font-size:13px;"><strong>X축</strong> 24년 평균比 (분기합산 평균) / <strong>Y축</strong> 26년 1Q比 (분기합산 평균) / <strong style="color:rgba(100,100,100,.8);">회색 점선</strong> = 100% 기준선 (이 선 위·오른쪽 = 성장)</div>
+    <div class="lgd" style="margin-bottom:8px;">
+      <span><span class="ldot" style="background:#1D9E75;width:11px;height:11px;"></span>PS&amp;M 자체선정 9개</span>
+      <span><span class="ldot" style="background:#ccc;"></span>SKT 선정 22개 (참고)</span>
+    </div>
+    <div style="position:relative;width:100%;height:400px;"><canvas id="q-quad"></canvas></div>
+  </div>
+</div>
+
+<!-- ⑤ 유형분류 × 기준 교차 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">7</span>유형 분류 × 기준 교차 — 26년 4~6월 분기 합산 기준<span class="sub-badge">참고</span></div>
+<div class="purpose purpose-sub"><div class="purpose-icon">🏷️</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">나랑 비슷한 매장은 어디? 무엇이 부족한가? — 매장군별로 묶어서 비교합니다</div><div class="purpose-desc"></div></div></div>
+  <div class="dir-bar" style="margin-bottom:8px;font-size:13px;">
+    <strong>26년 4~6월 2040 내방 평균 기준</strong>
+    <span style="color:#ddd;">|</span>
+    <span style="color:#888;">직영 기준: 24년 평균比 <strong>87.4%</strong> · 1Q比 <strong>75.6%</strong></span>
+  </div>
+  <div class="type-guide" style="grid-template-columns:repeat(3,1fr);">
+    <div class="tg tgExc"><div class="tg-hd">우수</div><div class="tg-dc">24년 연평균·26년 1Q比 4~6월 성장 (김포고촌역점)</div></div>
+    <div class="tg tgGrow"><div class="tg-hd">24년 대비 성장</div><div class="tg-dc">24년 연평균比 4~6월 평균 ≥ 100% (서면롯데점·다사점·탕정점)</div></div>
+    <div class="tg tgLag"><div class="tg-hd">성장X</div><div class="tg-dc">24年比·1Q比 모두 &lt;100% (신림역점·수완장덕점·청라점·춘천명동점·배곧신도시점)</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th style="text-align:left;font-size:13px;">매장</th><th style="font-size:13px;">유형</th><th style="font-size:13px;">4~6월 2040내방평균</th><th style="font-size:13px;">24평균比</th><th style="font-size:13px;">1Q比</th></tr></thead>
+        <tbody id="q-type-tbody"></tbody>
+      </table>
+      <div class="note" style="font-size:12px;margin-top:8px;margin-bottom:0;"><strong style="color:#3B6D11;">초록</strong> = 직영 평균(24평균比 87.4% · 1Q比 75.6%) 기준 상회 · <strong style="color:#854F0B;">주황</strong> = 근접(±5%p) · <strong style="color:#A32D2D;">빨강</strong> = 미달</div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:#888;margin-bottom:8px;">26년 4~6월 월평균 연령대별 내방</div>
+      <div id="q-agechart" style="width:100%;display:block;"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 324' style='width:100%;display:block;font-family:-apple-system,sans-serif;'>
+<rect width='700' height='324' fill='white'/>
+<rect x='112' y='4' width='10' height='9' rx='1.5' fill='#C5DFC5'/>
+<text x='125' y='12' font-size='9.5' fill='#444'>10대</text>
+<rect x='157' y='4' width='10' height='9' rx='1.5' fill='#AECDE8'/>
+<text x='170' y='12' font-size='9.5' fill='#444'>20대</text>
+<rect x='202' y='4' width='10' height='9' rx='1.5' fill='#A8C8B8'/>
+<text x='215' y='12' font-size='9.5' fill='#444'>30대</text>
+<rect x='247' y='4' width='10' height='9' rx='1.5' fill='#E8B4A0'/>
+<text x='260' y='12' font-size='9.5' fill='#444'>40대</text>
+<rect x='292' y='4' width='10' height='9' rx='1.5' fill='#C4B4D4'/>
+<text x='305' y='12' font-size='9.5' fill='#444'>50대</text>
+<rect x='337' y='4' width='10' height='9' rx='1.5' fill='#B8B8B8'/>
+<text x='350' y='12' font-size='9.5' fill='#444'>60대</text>
+<rect x='382' y='4' width='10' height='9' rx='1.5' fill='#DDDDCC'/>
+<text x='395' y='12' font-size='9.5' fill='#444'>기타</text>
+<line x1='142.4' y1='26' x2='142.4' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='142.4' y='22' text-anchor='middle' font-size='8' fill='#ccc'>100</text>
+<line x1='172.8' y1='26' x2='172.8' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='172.8' y='22' text-anchor='middle' font-size='8' fill='#ccc'>200</text>
+<line x1='203.1' y1='26' x2='203.1' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='203.1' y='22' text-anchor='middle' font-size='8' fill='#ccc'>300</text>
+<line x1='233.5' y1='26' x2='233.5' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='233.5' y='22' text-anchor='middle' font-size='8' fill='#ccc'>400</text>
+<line x1='263.9' y1='26' x2='263.9' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='263.9' y='22' text-anchor='middle' font-size='8' fill='#ccc'>500</text>
+<line x1='294.3' y1='26' x2='294.3' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='294.3' y='22' text-anchor='middle' font-size='8' fill='#ccc'>600</text>
+<line x1='324.6' y1='26' x2='324.6' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='324.6' y='22' text-anchor='middle' font-size='8' fill='#ccc'>700</text>
+<line x1='355.0' y1='26' x2='355.0' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='355.0' y='22' text-anchor='middle' font-size='8' fill='#ccc'>800</text>
+<line x1='385.4' y1='26' x2='385.4' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='385.4' y='22' text-anchor='middle' font-size='8' fill='#ccc'>900</text>
+<line x1='415.8' y1='26' x2='415.8' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='415.8' y='22' text-anchor='middle' font-size='8' fill='#ccc'>1000</text>
+<line x1='476.5' y1='26' x2='476.5' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='476.5' y='22' text-anchor='middle' font-size='8' fill='#ccc'>1200</text>
+<line x1='537.3' y1='26' x2='537.3' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='537.3' y='22' text-anchor='middle' font-size='8' fill='#ccc'>1400</text>
+<line x1='598.0' y1='26' x2='598.0' y2='296' stroke='rgba(0,0,0,.06)' stroke-width='.8'/>
+<text x='598.0' y='22' text-anchor='middle' font-size='8' fill='#ccc'>1600</text>
+<rect x='112.0' y='26' width='10.6' height='22' fill='#C5DFC5'/>
+<text x='117.3' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>35</text>
+<rect x='122.6' y='26' width='18.5' height='22' fill='#AECDE8'/>
+<text x='131.9' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>61</text>
+<rect x='141.2' y='26' width='19.4' height='22' fill='#A8C8B8'/>
+<text x='150.9' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>64</text>
+<rect x='160.6' y='26' width='27.6' height='22' fill='#E8B4A0'/>
+<text x='174.4' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>91</text>
+<rect x='188.2' y='26' width='24.3' height='22' fill='#C4B4D4'/>
+<text x='200.4' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>80</text>
+<rect x='212.5' y='26' width='62.6' height='22' fill='#B8B8B8'/>
+<text x='243.8' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>206</text>
+<rect x='275.1' y='26' width='20.4' height='22' fill='#DDDDCC'/>
+<text x='285.3' y='41.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>67</text>
+<text x='299.5' y='41.8' font-size='9' fill='#444' font-weight='700'>603</text>
+<text x='108' y='41.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>김포고촌역점</text>
+<rect x='112.0' y='56' width='32.2' height='22' fill='#C5DFC5'/>
+<text x='128.1' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>106</text>
+<rect x='144.2' y='56' width='11.8' height='22' fill='#AECDE8'/>
+<text x='150.1' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>39</text>
+<rect x='156.0' y='56' width='27.3' height='22' fill='#A8C8B8'/>
+<text x='169.7' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>90</text>
+<rect x='183.4' y='56' width='51.9' height='22' fill='#E8B4A0'/>
+<text x='209.4' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>171</text>
+<rect x='235.3' y='56' width='28.6' height='22' fill='#C4B4D4'/>
+<text x='249.6' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>94</text>
+<rect x='263.9' y='56' width='25.8' height='22' fill='#B8B8B8'/>
+<text x='276.8' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>85</text>
+<rect x='289.7' y='56' width='30.7' height='22' fill='#DDDDCC'/>
+<text x='305.0' y='71.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>101</text>
+<text x='324.4' y='71.8' font-size='9' fill='#444' font-weight='700'>687</text>
+<text x='108' y='71.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>탕정점</text>
+<rect x='112.0' y='86' width='22.8' height='22' fill='#C5DFC5'/>
+<text x='123.4' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>75</text>
+<rect x='134.8' y='86' width='12.8' height='22' fill='#AECDE8'/>
+<text x='141.2' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>42</text>
+<rect x='147.5' y='86' width='20.7' height='22' fill='#A8C8B8'/>
+<text x='157.9' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>68</text>
+<rect x='168.2' y='86' width='40.1' height='22' fill='#E8B4A0'/>
+<text x='188.2' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>132</text>
+<rect x='208.3' y='86' width='33.7' height='22' fill='#C4B4D4'/>
+<text x='225.1' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>111</text>
+<rect x='242.0' y='86' width='29.8' height='22' fill='#B8B8B8'/>
+<text x='256.9' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>98</text>
+<rect x='271.8' y='86' width='24.3' height='22' fill='#DDDDCC'/>
+<text x='283.9' y='101.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>80</text>
+<text x='300.1' y='101.8' font-size='9' fill='#444' font-weight='700'>606</text>
+<text x='108' y='101.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>배곧신도시점</text>
+<rect x='112.0' y='116' width='31.3' height='22' fill='#C5DFC5'/>
+<text x='127.6' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>103</text>
+<rect x='143.3' y='116' width='20.4' height='22' fill='#AECDE8'/>
+<text x='153.5' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>67</text>
+<rect x='163.6' y='116' width='33.4' height='22' fill='#A8C8B8'/>
+<text x='180.3' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>110</text>
+<rect x='197.0' y='116' width='57.1' height='22' fill='#E8B4A0'/>
+<text x='225.6' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>188</text>
+<rect x='254.2' y='116' width='46.8' height='22' fill='#C4B4D4'/>
+<text x='277.5' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>154</text>
+<rect x='300.9' y='116' width='54.4' height='22' fill='#B8B8B8'/>
+<text x='328.1' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>179</text>
+<rect x='355.3' y='116' width='27.9' height='22' fill='#DDDDCC'/>
+<text x='369.3' y='131.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>92</text>
+<text x='387.2' y='131.8' font-size='9' fill='#444' font-weight='700'>893</text>
+<text x='108' y='131.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>수완장덕점</text>
+<rect x='112.0' y='146' width='17.3' height='22' fill='#C5DFC5'/>
+<text x='120.7' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>57</text>
+<rect x='129.3' y='146' width='29.8' height='22' fill='#AECDE8'/>
+<text x='144.2' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>98</text>
+<rect x='159.1' y='146' width='54.4' height='22' fill='#A8C8B8'/>
+<text x='186.3' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>179</text>
+<rect x='213.5' y='146' width='61.7' height='22' fill='#E8B4A0'/>
+<text x='244.3' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>203</text>
+<rect x='275.1' y='146' width='69.0' height='22' fill='#C4B4D4'/>
+<text x='309.6' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>227</text>
+<rect x='344.1' y='146' width='204.4' height='22' fill='#B8B8B8'/>
+<text x='446.3' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>673</text>
+<rect x='548.5' y='146' width='44.0' height='22' fill='#DDDDCC'/>
+<text x='570.5' y='161.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>145</text>
+<text x='596.5' y='161.8' font-size='9' fill='#444' font-weight='700'>1581</text>
+<text x='108' y='161.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>서면롯데점</text>
+<rect x='112.0' y='176' width='29.2' height='22' fill='#C5DFC5'/>
+<text x='126.6' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>96</text>
+<rect x='141.2' y='176' width='15.8' height='22' fill='#AECDE8'/>
+<text x='149.1' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>52</text>
+<rect x='157.0' y='176' width='23.4' height='22' fill='#A8C8B8'/>
+<text x='168.6' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>77</text>
+<rect x='180.3' y='176' width='43.4' height='22' fill='#E8B4A0'/>
+<text x='202.1' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>143</text>
+<rect x='223.8' y='176' width='52.5' height='22' fill='#C4B4D4'/>
+<text x='250.1' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>173</text>
+<rect x='276.3' y='176' width='105.7' height='22' fill='#B8B8B8'/>
+<text x='329.2' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>348</text>
+<rect x='382.0' y='176' width='30.4' height='22' fill='#DDDDCC'/>
+<text x='397.2' y='191.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>100</text>
+<text x='416.4' y='191.8' font-size='9' fill='#444' font-weight='700'>988</text>
+<text x='108' y='191.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>다사점</text>
+<rect x='112.0' y='206' width='9.1' height='22' fill='#C5DFC5'/>
+<text x='116.6' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>30</text>
+<rect x='121.1' y='206' width='19.7' height='22' fill='#AECDE8'/>
+<text x='131.0' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>65</text>
+<rect x='140.9' y='206' width='31.6' height='22' fill='#A8C8B8'/>
+<text x='156.7' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>104</text>
+<rect x='172.4' y='206' width='31.3' height='22' fill='#E8B4A0'/>
+<text x='188.1' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>103</text>
+<rect x='203.7' y='206' width='33.1' height='22' fill='#C4B4D4'/>
+<text x='220.3' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>109</text>
+<rect x='236.8' y='206' width='80.8' height='22' fill='#B8B8B8'/>
+<text x='277.2' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>266</text>
+<rect x='317.6' y='206' width='21.9' height='22' fill='#DDDDCC'/>
+<text x='328.6' y='221.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>72</text>
+<text x='343.5' y='221.8' font-size='9' fill='#444' font-weight='700'>750</text>
+<text x='108' y='221.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>신림역점</text>
+<rect x='112.0' y='236' width='9.7' height='22' fill='#C5DFC5'/>
+<text x='116.9' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>32</text>
+<rect x='121.7' y='236' width='12.5' height='22' fill='#AECDE8'/>
+<text x='127.9' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>41</text>
+<rect x='134.2' y='236' width='10.0' height='22' fill='#A8C8B8'/>
+<text x='139.2' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>33</text>
+<rect x='144.2' y='236' width='23.1' height='22' fill='#E8B4A0'/>
+<text x='155.7' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>76</text>
+<rect x='167.3' y='236' width='20.4' height='22' fill='#C4B4D4'/>
+<text x='177.5' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>67</text>
+<rect x='187.6' y='236' width='48.3' height='22' fill='#B8B8B8'/>
+<text x='211.8' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>159</text>
+<rect x='235.9' y='236' width='9.4' height='22' fill='#DDDDCC'/>
+<text x='240.6' y='251.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>31</text>
+<text x='249.3' y='251.8' font-size='9' fill='#444' font-weight='700'>438</text>
+<text x='108' y='251.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>춘천명동점</text>
+<rect x='112.0' y='266' width='21.9' height='22' fill='#C5DFC5'/>
+<text x='122.9' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>72</text>
+<rect x='133.9' y='266' width='18.2' height='22' fill='#AECDE8'/>
+<text x='143.0' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>60</text>
+<rect x='152.1' y='266' width='31.9' height='22' fill='#A8C8B8'/>
+<text x='168.0' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>105</text>
+<rect x='184.0' y='266' width='54.1' height='22' fill='#E8B4A0'/>
+<text x='211.0' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>178</text>
+<rect x='238.1' y='266' width='40.4' height='22' fill='#C4B4D4'/>
+<text x='258.3' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>133</text>
+<rect x='278.5' y='266' width='51.3' height='22' fill='#B8B8B8'/>
+<text x='304.1' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>169</text>
+<rect x='329.8' y='266' width='33.4' height='22' fill='#DDDDCC'/>
+<text x='346.5' y='281.8' text-anchor='middle' font-size='8.5' fill='rgba(0,0,0,.6)'>110</text>
+<text x='367.2' y='281.8' font-size='9' fill='#444' font-weight='700'>827</text>
+<text x='108' y='281.8' text-anchor='end' font-size='10' fill='#222' font-weight='600'>청라점</text>
+</svg></div>
+      <div class="lgd" style="flex-wrap:wrap;gap:8px;margin-top:8px;">
+        <span><span class="ldot" style="background:#C5DFC5;"></span>10대</span>
+        <span><span class="ldot" style="background:#AECDE8;"></span>20대</span>
+        <span><span class="ldot" style="background:#A8C8B8;"></span>30대</span>
+        <span><span class="ldot" style="background:#E8B4A0;"></span>40대</span>
+        <span><span class="ldot" style="background:#C4B4D4;"></span>50대</span>
+        <span><span class="ldot" style="background:#B8B8B8;"></span>60대</span>
+        <span><span class="ldot" style="background:#DDDDCC;"></span>기타</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 참고도표 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">8</span>참고) 26년 4~6월 내방 현황<span class="sub-badge">참고</span></div>
+<div class="purpose purpose-sub"><div class="purpose-icon">📋</div><div class="purpose-body"><div class="purpose-label">이 섹션의 역할</div><div class="purpose-title">전체 수치를 한 표에서 — PS&M 9개점 + SKT 22개점 원본 데이터를 비교합니다</div><div class="purpose-desc">전체 내방·2040 내방 평균을 24년 比·1Q比로 한 번에 확인. 다른 매장과의 수치 비교가 필요할 때 활용하세요.</div></div></div>
+  <div class="note" style="font-size:13px;"><strong style="color:#3B6D11;">초록</strong> = 직영 평균 기준 상회 · <strong style="color:#854F0B;">주황</strong> = 근접(±5%) · <strong style="color:#A32D2D;">빨강</strong> = 미달 / 머리글 클릭 시 정렬 / <strong>기준</strong>: 4~6월 내방 평균(명) · 24년 평균比 · 26년 1Q比</div>
+  <div style="overflow-x:auto;"><table class="ref-tbl" id="q-ref-table"></table></div>
+
+</div><!-- /sub-zone -->
+</div><!-- /inner -->
+</div><!-- /ttp0 (분기종합) -->
+
+<!-- ══════════════ 탭 1: 6월 Monthly ══════════════ -->
+<div class="top-tab-panel" id="ttp1">
+<div class="inner">
+
+<div class="hd">
+  <div><div class="hd-title">2040 특화매장 분석자료 — 6월 Monthly<span class="hd-ver">Clarity v3.2</span></div></div>
+  <div class="hd-meta">기준일 2026.06.30 (6월 진척률 100%, 마감)<br>PS&amp;Marketing 유통인텔리전스팀</div>
+</div>
+
+<!-- ① KPI -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">①</span>핵심 KPI 현황</div>
+  <div class="how">
+    <div class="how-item">
+      <div class="how-lbl">24년 평균 比</div>
+      <div class="how-desc">작년 한 해 전체 평균 대비 → 기초 체력이 작년을 넘었는가?</div>
+    </div>
+    <div class="how-item">
+      <div class="how-lbl">24년 동월 比</div>
+      <div class="how-desc">작년 6월 대비 → 계절성을 제거하고, 같은 시기와 비교해 실질적인 성장을 했는가?</div>
+    </div>
+    <div class="how-item">
+      <div class="how-lbl">26년 1Q 比</div>
+      <div class="how-desc">올해 1~3월 평균 대비 → TF 초기 수준이 지금도 유지되는가?</div>
+    </div>
+  </div>
+  <div class="dir-bar">
+    <strong>26년 6월 2040 내방 기준</strong>
+    <span style="color:#ddd;">|</span>
+    <span><strong>직영 평균</strong> 기준선: 24평균比 96.2% · 동월比 112.0% · 1Q比 83.1%</span>
+  </div>
+
+  <div class="kpi-panel">
+    <div class="kpi-panel-hd">
+      <span class="kpi-badge" style="background:#EAF3DE;color:#3B6D11;">1-1</span>
+      <span class="kpi-panel-title">성장 관점 — 작년 수준(100%) 초과 매장</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card-l">① 24년 평균比 26년 6월 2040내방 성장수준 ≥ 100%</div>
+        <div class="kpi-card-v" style="color:#3B6D11;">6<span style="font-size:16px;font-weight:400;color:#888;"> / 9店</span></div>
+        <div class="kpi-card-tags">
+          <span class="stag stag-g">김포 130.0%</span><span class="stag stag-g">배곧 106.5%</span><span class="stag stag-g">서면 103.0%</span><span class="stag stag-g">다사 106.7%</span><span class="stag stag-g">수완 108.3%</span><span class="stag stag-g">탕정 143.0%</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-l">② 24년 동월比 26년 6월 2040내방 성장수준 ≥ 100%</div>
+        <div class="kpi-card-v" style="color:#3B6D11;">7<span style="font-size:16px;font-weight:400;color:#888;"> / 9店</span></div>
+        <div class="kpi-card-tags">
+          <span class="stag stag-g">김포 142.3%</span><span class="stag stag-g">배곧 124.9%</span><span class="stag stag-g">청라 114.6%</span><span class="stag stag-g">신림역 105.6%</span><span class="stag stag-g">다사 118.0%</span><span class="stag stag-g">수완 143.8%</span><span class="stag stag-g">탕정 164.7%</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-l">③ 26년 1Q比 26년 6월 2040내방 성장수준 ≥ 100%</div>
+        <div class="kpi-card-v" style="color:#854F0B;">2<span style="font-size:16px;font-weight:400;color:#888;"> / 9店</span></div>
+        <div class="kpi-card-tags">
+          <span class="stag stag-g">김포 121.0%</span><span class="stag stag-g">수완 102.2%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ② 4분면 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">②</span>4분면 포지셔닝 — 직영 평균 기준 분포</div>
+  <div class="card">
+    <div class="note"><strong>X축</strong> 24년 평균比 / <strong>Y축</strong> 24년 동월比 / <strong style="color:#1D9E75;">녹색 점선</strong> = 직영 평균(X:96.2% · Y:112.0%) / <strong style="color:rgba(0,0,0,.4);">회색 점선</strong> = 100% 기준선 / 버블 크기 = 1Q 수준 유지 정도</div>
+    <div class="lgd" style="margin-bottom:8px;">
+      <span><span class="ldot" style="background:#1D9E75;width:11px;height:11px;"></span>PS&amp;M 자체선정 9개</span>
+      <span><span class="ldot" style="background:#ccc;"></span>SKT 선정 22개 (참고)</span>
+      <span style="margin-left:auto;font-size:11px;color:#aaa;">버블 크기 = 1Q 수준 유지 정도</span>
+    </div>
+    <div style="position:relative;width:100%;height:400px;"><canvas id="m-quad"></canvas></div>
+  </div>
+</div>
+
+<!-- ③ 내방 추이 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">③</span>매장별 2040 내방 / 성장 추이</div>
+  <div class="card">
+    <div class="note"><strong>X축</strong> 24년 평균比 / <strong>Y축</strong> 24년 동월比 / 점선 = 직영 평균 기준선(X:96.2% / Y:112.0%). 두 도형이 모두 우상단 = 전체·2040 동시 성장.</div>
+    <div class="lgd" style="margin-bottom:10px;">
+      <span><span class="ldot" style="background:#378ADD;"></span>전체내방 (원)</span>
+      <span><span class="lsq" style="background:#D85A30;width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;"></span>2040내방 (사각)</span>
+      <span style="margin-left:auto;font-size:11px;color:#aaa;">점선 = 직영 평균 기준선</span>
+    </div>
+    <div class="sg3" id="sg1"></div>
+  </div>
+</div>
+
+<!-- ④ 26년 6월 연령대별 내방 구성 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">④</span>26년 6월 연령대별 내방 구성 — 10대~60대·기타 (PS&amp;M 9店)</div>
+  <div class="card">
+    <div style="position:relative;width:100%;height:340px;"><canvas id="agechart"></canvas></div>
+    <div class="lgd" style="flex-wrap:wrap;gap:8px;margin-top:8px;">
+      <span><span class="ldot" style="background:#C5DFC5;"></span>10대</span>
+      <span><span class="ldot" style="background:#AECDE8;"></span>20대</span>
+      <span><span class="ldot" style="background:#A8C8B8;"></span>30대</span>
+      <span><span class="ldot" style="background:#E8B4A0;"></span>40대</span>
+      <span><span class="ldot" style="background:#C4B4D4;"></span>50대</span>
+      <span><span class="ldot" style="background:#B8B8B8;"></span>60대</span>
+      <span><span class="ldot" style="background:#DDDDCC;"></span>기타</span>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 참고도표 -->
+<div class="sec">
+  <div class="sec-hd"><span class="sec-num">⑤</span>참고 도표 — 직영·PS&amp;M·SKT·31店 전체 내방 성과</div>
+  <div class="note"><strong style="color:#3B6D11;">초록</strong> = 직영 평균 기준 상회 · <strong style="color:#854F0B;">주황</strong> = 근접(±5%) · <strong style="color:#A32D2D;">빨강</strong> = 미달 / 머리글 클릭 시 정렬</div>
+  <div style="overflow-x:auto;"><table class="ref-tbl" id="ref-table"></table></div>
+</div>
+
+</div><!-- /inner -->
+</div><!-- /ttp1 (6월Monthly) -->
+
+<script>
+/* ══════ 공통 데이터 ══════ */
+var DIR_R24=0.962,DIR_RMON=1.1204,DIR_R1Q=0.8315;
+var gc="rgba(0,0,0,.07)",tc="rgba(0,0,0,.5)";
+var tabChartsM={};
+
+/* 4월·5월·6월 연령대 데이터 */
+var ageData={
+  "김포고촌역점":{
+    m4:{a40:202,age10:18,age20:59,age30:70,age40:73,age50:77,age60:193,sale:17,psr:0.0842},
+    m5:{a40:211,age10:43,age20:55,age30:59,age40:97,age50:87,age60:212,sale:13,psr:0.0616},
+    m6:{a40:232,age10:44,age20:68,age30:62,age40:102,age50:76,age60:214,sale:25,psr:0.1078},
+  },
+  "배곧신도시점":{
+    m4:{a40:228,age10:65,age20:46,age30:54,age40:128,age50:123,age60:105,sale:30,psr:0.1316},
+    m5:{a40:225,age10:90,age20:39,age30:62,age40:124,age50:97,age60:87,sale:29,psr:0.1289},
+    m6:{a40:271,age10:69,age20:41,age30:87,age40:143,age50:114,age60:103,sale:48,psr:0.1771},
+  },
+  "청라점":{
+    m4:{a40:348,age10:64,age20:55,age30:105,age40:188,age50:146,age60:175,sale:29,psr:0.0833},
+    m5:{a40:326,age10:77,age20:67,age30:98,age40:161,age50:100,age60:156,sale:43,psr:0.1319},
+    m6:{a40:354,age10:75,age20:59,age30:111,age40:184,age50:153,age60:176,sale:37,psr:0.1045},
+  },
+  "신림역점":{
+    m4:{a40:300,age10:31,age20:73,age30:108,age40:119,age50:101,age60:272,sale:42,psr:0.14},
+    m5:{a40:235,age10:27,age20:63,age30:93,age40:79,age50:93,age60:255,sale:35,psr:0.1489},
+    m6:{a40:282,age10:33,age20:60,age30:112,age40:110,age50:132,age60:271,sale:36,psr:0.1277},
+  },
+  "춘천명동점":{
+    m4:{a40:160,age10:30,age20:36,age30:46,age40:78,age50:74,age60:146,sale:23,psr:0.1437},
+    m5:{a40:137,age10:29,age20:41,age30:27,age40:69,age50:67,age60:170,sale:14,psr:0.1022},
+    m6:{a40:154,age10:37,age20:45,age30:27,age40:82,age50:59,age60:160,sale:31,psr:0.2013},
+  },
+  "서면롯데점":{
+    m4:{a40:504,age10:50,age20:106,age30:185,age40:213,age50:222,age60:672,sale:41,psr:0.0813},
+    m5:{a40:444,age10:50,age20:109,age30:167,age40:168,age50:215,age60:636,sale:37,psr:0.0833},
+    m6:{a40:491,age10:70,age20:78,age30:186,age40:227,age50:243,age60:711,sale:46,psr:0.0937},
+  },
+  "다사점":{
+    m4:{a40:283,age10:86,age20:53,age30:103,age40:127,age50:163,age60:325,sale:33,psr:0.1166},
+    m5:{a40:242,age10:102,age20:58,age30:58,age40:126,age50:142,age60:350,sale:27,psr:0.1116},
+    m6:{a40:289,age10:100,age20:44,age30:69,age40:176,age50:213,age60:369,sale:40,psr:0.1384},
+  },
+  "수완장덕점":{
+    m4:{a40:326,age10:95,age20:57,age30:104,age40:165,age50:144,age60:154,sale:36,psr:0.1104},
+    m5:{a40:318,age10:108,age20:72,age30:91,age40:155,age50:152,age60:175,sale:48,psr:0.1509},
+    m6:{a40:450,age10:107,age20:71,age30:135,age40:244,age50:166,age60:207,sale:68,psr:0.1511},
+  },
+  "탕정점":{
+    m4:{a40:277,age10:95,age20:40,age30:93,age40:144,age50:82,age60:79,sale:22,psr:0.0794},
+    m5:{a40:264,age10:91,age20:48,age30:74,age40:142,age50:103,age60:69,sale:21,psr:0.0795},
+    m6:{a40:359,age10:132,age20:30,age30:103,age40:226,age50:98,age60:108,sale:36,psr:0.1003},
+  },
+  "IFC점":{
+    m4:{a40:617,age10:65,age20:94,age30:217,age40:306,age50:234,age60:190,sale:54,psr:0.0875},
+    m5:{a40:596,age10:64,age20:112,age30:230,age40:254,age50:218,age60:193,sale:67,psr:0.1124},
+    m6:{a40:832,age10:96,age20:140,age30:265,age40:427,age50:336,age60:253,sale:77,psr:0.0925},
+  },
+  "동림점":{
+    m4:{a40:172,age10:58,age20:37,age30:31,age40:104,age50:115,age60:158,sale:16,psr:0.093},
+    m5:{a40:135,age10:52,age20:22,age30:38,age40:75,age50:75,age60:127,sale:17,psr:0.1259},
+    m6:{a40:256,age10:41,age20:44,age30:77,age40:135,age50:117,age60:195,sale:26,psr:0.1016},
+  },
+  "을지로점":{
+    m4:{a40:630,age10:49,age20:93,age30:223,age40:314,age50:257,age60:356,sale:71,psr:0.1127},
+    m5:{a40:527,age10:39,age20:84,age30:214,age40:229,age50:240,age60:288,sale:50,psr:0.0949},
+    m6:{a40:726,age10:79,age20:106,age30:250,age40:370,age50:310,age60:347,sale:52,psr:0.0716},
+  },
+  "광화문점":{
+    m4:{a40:461,age10:40,age20:80,age30:171,age40:210,age50:249,age60:183,sale:61,psr:0.1323},
+    m5:{a40:432,age10:55,age20:63,age30:197,age40:172,age50:194,age60:168,sale:60,psr:0.1389},
+    m6:{a40:583,age10:64,age20:65,age30:183,age40:335,age50:256,age60:257,sale:72,psr:0.1235},
+  },
+  "전북대점":{
+    m4:{a40:184,age10:19,age20:56,age30:60,age40:68,age50:95,age60:93,sale:10,psr:0.0543},
+    m5:{a40:246,age10:31,age20:75,age30:87,age40:84,age50:75,age60:105,sale:24,psr:0.0976},
+    m6:{a40:244,age10:25,age20:73,age30:83,age40:88,age50:95,age60:122,sale:21,psr:0.0861},
+  },
+  "뱅뱅사거리점":{
+    m4:{a40:504,age10:23,age20:86,age30:180,age40:238,age50:207,age60:217,sale:33,psr:0.0655},
+    m5:{a40:467,age10:32,age20:70,age30:158,age40:239,age50:144,age60:210,sale:36,psr:0.0771},
+    m6:{a40:501,age10:55,age20:87,age30:168,age40:246,age50:211,age60:230,sale:32,psr:0.0639},
+  },
+  "수원스타필드점":{
+    m4:{a40:356,age10:107,age20:77,age30:112,age40:167,age50:150,age60:136,sale:46,psr:0.1292},
+    m5:{a40:351,age10:110,age20:87,age30:125,age40:139,age50:181,age60:173,sale:59,psr:0.1681},
+    m6:{a40:463,age10:105,age20:78,age30:141,age40:244,age50:198,age60:201,sale:87,psr:0.1879},
+  },
+  "일산본점":{
+    m4:{a40:448,age10:53,age20:93,age30:158,age40:197,age50:245,age60:266,sale:67,psr:0.1496},
+    m5:{a40:461,age10:71,age20:107,age30:170,age40:184,age50:249,age60:279,sale:79,psr:0.1714},
+    m6:{a40:475,age10:86,age20:100,age30:154,age40:221,age50:267,age60:306,sale:71,psr:0.1495},
+  },
+  "분당서현역점":{
+    m4:{a40:336,age10:41,age20:55,age30:97,age40:184,age50:126,age60:281,sale:23,psr:0.0685},
+    m5:{a40:332,age10:64,age20:76,age30:90,age40:166,age50:178,age60:222,sale:36,psr:0.1084},
+    m6:{a40:468,age10:91,age20:84,age30:109,age40:275,age50:204,age60:337,sale:55,psr:0.1175},
+  },
+  "용산역점":{
+    m4:{a40:393,age10:24,age20:79,age30:148,age40:166,age50:129,age60:129,sale:47,psr:0.1196},
+    m5:{a40:332,age10:21,age20:86,age30:115,age40:131,age50:98,age60:139,sale:35,psr:0.1054},
+    m6:{a40:369,age10:48,age20:88,age30:120,age40:161,age50:146,age60:216,sale:45,psr:0.122},
+  },
+  "종로공평점":{
+    m4:{a40:234,age10:23,age20:26,age30:76,age40:132,age50:129,age60:100,sale:20,psr:0.0855},
+    m5:{a40:209,age10:23,age20:21,age30:67,age40:121,age50:76,age60:89,sale:11,psr:0.0526},
+    m6:{a40:225,age10:19,age20:27,age30:74,age40:124,age50:126,age60:98,sale:10,psr:0.0444},
+  },
+  "삼산점":{
+    m4:{a40:203,age10:29,age20:46,age30:72,age40:85,age50:98,age60:157,sale:22,psr:0.1084},
+    m5:{a40:172,age10:32,age20:30,age30:65,age40:77,age50:79,age60:129,sale:12,psr:0.0698},
+    m6:{a40:230,age10:36,age20:41,age30:74,age40:115,age50:116,age60:153,sale:30,psr:0.1304},
+  },
+  "잠실롯데점":{
+    m4:{a40:264,age10:35,age20:51,age30:103,age40:110,age50:68,age60:106,sale:34,psr:0.1288},
+    m5:{a40:190,age10:39,age20:37,age30:70,age40:83,age50:61,age60:97,sale:40,psr:0.2105},
+    m6:{a40:233,age10:35,age20:40,age30:79,age40:114,age50:65,age60:130,sale:45,psr:0.1931},
+  },
+  "청주지웰시티점":{
+    m4:{a40:411,age10:86,age20:75,age30:136,age40:200,age50:197,age60:195,sale:53,psr:0.129},
+    m5:{a40:364,age10:130,age20:79,age30:110,age40:175,age50:172,age60:162,sale:46,psr:0.1264},
+    m6:{a40:430,age10:109,age20:93,age30:132,age40:205,age50:204,age60:212,sale:63,psr:0.1465},
+  },
+  "대학로점":{
+    m4:{a40:216,age10:28,age20:61,age30:55,age40:100,age50:100,age60:149,sale:23,psr:0.1065},
+    m5:{a40:196,age10:32,age20:49,age30:43,age40:104,age50:84,age60:144,sale:20,psr:0.102},
+    m6:{a40:252,age10:22,age20:62,age30:68,age40:122,age50:100,age60:171,sale:34,psr:0.1349},
+  },
+  "수성센터":{
+    m4:{a40:353,age10:133,age20:80,age30:100,age40:173,age50:253,age60:365,sale:38,psr:0.1076},
+    m5:{a40:326,age10:155,age20:81,age30:79,age40:166,age50:211,age60:369,sale:29,psr:0.089},
+    m6:{a40:374,age10:154,age20:86,age30:81,age40:207,age50:240,age60:403,sale:44,psr:0.1176},
+  },
+  "둔산본점":{
+    m4:{a40:420,age10:77,age20:96,age30:127,age40:197,age50:264,age60:379,sale:52,psr:0.1238},
+    m5:{a40:403,age10:102,age20:63,age30:149,age40:191,age50:228,age60:380,sale:38,psr:0.0943},
+    m6:{a40:475,age10:92,age20:93,age30:158,age40:224,age50:248,age60:427,sale:52,psr:0.1095},
+  },
+  "상남센터":{
+    m4:{a40:315,age10:51,age20:90,age30:102,age40:123,age50:174,age60:222,sale:45,psr:0.1429},
+    m5:{a40:330,age10:56,age20:62,age30:113,age40:155,age50:132,age60:214,sale:43,psr:0.1303},
+    m6:{a40:394,age10:65,age20:79,age30:148,age40:167,age50:188,age60:266,sale:39,psr:0.099},
+  },
+  "구미확장단지점":{
+    m4:{a40:175,age10:52,age20:15,age30:54,age40:106,age50:41,age60:64,sale:20,psr:0.1143},
+    m5:{a40:149,age10:59,age20:11,age30:44,age40:94,age50:57,age60:54,sale:13,psr:0.0872},
+    m6:{a40:233,age10:90,age20:18,age30:67,age40:148,age50:68,age60:62,sale:31,psr:0.133},
+  },
+  "양산점":{
+    m4:{a40:140,age10:73,age20:20,age30:27,age40:93,age50:95,age60:165,sale:14,psr:0.1},
+    m5:{a40:174,age10:75,age20:25,age30:65,age40:84,age50:87,age60:133,sale:19,psr:0.1092},
+    m6:{a40:208,age10:65,age20:27,age30:49,age40:132,age50:94,age60:158,sale:31,psr:0.149},
+  },
+  "무교점":{
+    m4:{a40:219,age10:29,age20:35,age30:75,age40:109,age50:169,age60:132,sale:28,psr:0.1279},
+    m5:{a40:183,age10:14,age20:25,age30:63,age40:95,age50:84,age60:111,sale:16,psr:0.0874},
+    m6:{a40:212,age10:33,age20:29,age30:77,age40:106,age50:119,age60:135,sale:27,psr:0.1274},
+  },
+  "명지점":{
+    m4:{a40:350,age10:117,age20:29,age30:137,age40:184,age50:73,age60:179,sale:23,psr:0.0657},
+    m5:{a40:256,age10:122,age20:31,age30:94,age40:131,age50:84,age60:214,sale:26,psr:0.1016},
+    m6:{a40:379,age10:135,age20:49,age30:95,age40:235,age50:149,age60:238,sale:40,psr:0.1055},
+  },
+};
+
+var stores=[
+  {n:"김포고촌역점",sn:"김포",type:"우수",
+   a40_m:[202,211,232],tot_m:[551,618,641],
+   a_r24:[1.1322,1.1826,1.3003],a_rm:[1.2704,1.0765,1.4233],a_1q:[1.0539,1.1009,1.2104],
+   t_r24:1.2726,t_rm:1.4515,t_1q:1.0134,a_r24_6:1.3003,a_rm_6:1.4233,a_1q_6:1.2104,
+   age10:35,age20:60.7,age30:63.7,age40:90.7,age50:80,age60:206.3,
+   q_a40:215,q_tot:603.3,q_r24:1.205,q_1q:1.1217,
+   t_q_r24:1.2726,t_q_1q:1.0134},
+  {n:"배곧신도시점",sn:"배곧",type:"24년 대비 성장",
+   a40_m:[228,225,271],tot_m:[591,585,642],
+   a_r24:[0.8956,0.8838,1.0645],a_rm:[1.0411,0.9109,1.2488],a_1q:[0.6387,0.6303,0.7591],
+   t_r24:1.0873,t_rm:1.1391,t_1q:0.7041,a_r24_6:1.0645,a_rm_6:1.2488,a_1q_6:0.7591,
+   age10:74.7,age20:42,age30:67.7,age40:131.7,age50:111.3,age60:98.3,
+   q_a40:241.3,q_tot:606,q_r24:0.948,q_1q:0.676,
+   t_q_r24:1.0873,t_q_1q:0.7041},
+  {n:"청라점",sn:"청라",type:"성장X",
+   a40_m:[348,326,354],tot_m:[842,742,897],
+   a_r24:[0.9539,0.8936,0.9703],a_rm:[1.3182,1.2395,1.1456],a_1q:[0.7255,0.6796,0.738],
+   t_r24:1.0367,t_rm:1.3339,t_1q:0.7435,a_r24_6:0.9703,a_rm_6:1.1456,a_1q_6:0.738,
+   age10:72,age20:60.3,age30:104.7,age40:177.7,age50:133,age60:169,
+   q_a40:342.7,q_tot:827,q_r24:0.9392,q_1q:0.7144,
+   t_q_r24:1.0367,t_q_1q:0.7435},
+  {n:"신림역점",sn:"신림역",type:"성장X",
+   a40_m:[300,235,282],tot_m:[775,664,810],
+   a_r24:[0.8396,0.6576,0.7892],a_rm:[1.0204,0.6583,1.0562],a_1q:[0.8234,0.645,0.774],
+   t_r24:0.9489,t_rm:1.0186,t_1q:0.8707,a_r24_6:0.7892,a_rm_6:1.0562,a_1q_6:0.774,
+   age10:30.3,age20:65.3,age30:104.3,age40:102.7,age50:108.7,age60:266,
+   q_a40:272.3,q_tot:749.7,q_r24:0.7621,q_1q:0.7475,
+   t_q_r24:0.9489,t_q_1q:0.8707},
+  {n:"춘천명동점",sn:"춘천",type:"성장X",
+   a40_m:[160,137,154],tot_m:[437,428,450],
+   a_r24:[1.0052,0.8607,0.9675],a_rm:[1.1679,1.0224,0.8603],a_1q:[0.8602,0.7366,0.828],
+   t_r24:1.0997,t_rm:1.1445,t_1q:0.8229,a_r24_6:0.9675,a_rm_6:0.8603,a_1q_6:0.828,
+   age10:32,age20:40.7,age30:33.3,age40:76.3,age50:66.7,age60:158.7,
+   q_a40:150.3,q_tot:438.3,q_r24:0.9445,q_1q:0.8082,
+   t_q_r24:1.0997,t_q_1q:0.8229},
+  {n:"서면롯데점",sn:"서면",type:"성장X",
+   a40_m:[504,444,491],tot_m:[1581,1486,1677],
+   a_r24:[1.0573,0.9315,1.0301],a_rm:[1.0746,0.9867,0.9939],a_1q:[0.9016,0.7943,0.8784],
+   t_r24:1.0389,t_rm:1.0468,t_1q:0.9076,a_r24_6:1.0301,a_rm_6:0.9939,a_1q_6:0.8784,
+   age10:56.7,age20:97.7,age30:179.3,age40:202.7,age50:226.7,age60:673,
+   q_a40:479.7,q_tot:1581.3,q_r24:1.0063,q_1q:0.8581,
+   t_q_r24:1.0389,t_q_1q:0.9076},
+  {n:"다사점",sn:"다사",type:"24년 대비 성장",
+   a40_m:[283,242,289],tot_m:[949,910,1106],
+   a_r24:[1.0449,0.8935,1.0671],a_rm:[1.0366,0.8403,1.1796],a_1q:[0.7183,0.6142,0.7335],
+   t_r24:1.3818,t_rm:1.3422,t_1q:0.8687,a_r24_6:1.0671,a_rm_6:1.1796,a_1q_6:0.7335,
+   age10:96,age20:51.7,age30:76.7,age40:143,age50:172.7,age60:348,
+   q_a40:271.3,q_tot:988.3,q_r24:1.0018,q_1q:0.6887,
+   t_q_r24:1.3818,t_q_1q:0.8687},
+  {n:"수완장덕점",sn:"수완",type:"우수",
+   a40_m:[326,318,450],tot_m:[798,825,1056],
+   a_r24:[0.7843,0.765,1.0826],a_rm:[0.9477,0.9845,1.4377],a_1q:[0.7403,0.7222,1.022],
+   t_r24:0.915,t_rm:1.1473,t_1q:0.8047,a_r24_6:1.0826,a_rm_6:1.4377,a_1q_6:1.022,
+   age10:103.3,age20:66.7,age30:110,age40:188,age50:154,age60:178.7,
+   q_a40:364.7,q_tot:893,q_r24:0.8773,q_1q:0.8282,
+   t_q_r24:0.915,t_q_1q:0.8047},
+  {n:"탕정점",sn:"탕정",type:"24년 대비 성장",
+   a40_m:[277,264,359],tot_m:[610,617,834],
+   a_r24:[1.1036,1.0518,1.4303],a_rm:[1.2203,1.1681,1.6468],a_1q:[0.6723,0.6408,0.8714],
+   t_r24:1.4481,t_rm:1.6702,t_1q:0.7807,a_r24_6:1.4303,a_rm_6:1.6468,a_1q_6:0.8714,
+   age10:106,age20:39.3,age30:90,age40:170.7,age50:94.3,age60:85.3,
+   q_a40:300,q_tot:687,q_r24:1.1952,q_1q:0.7282,
+   t_q_r24:1.4481,t_q_1q:0.7807}
+];
+
+var skt=[
+  {n:"IFC점",sn:"IF",type:"우수",
+   a40_m:[617,596,832],tot_m:[1285,1219,1740],
+   a_r24:[1.0118,0.9773,1.3643],a_rm:[1.0693,2.0694,16],a_1q:[0.7555,0.7298,1.0188],
+   t_r24:1.2365,t_rm:2.2916,t_1q:0.8419,a_r24_6:1.3643,a_rm_6:16,a_1q_6:1.0188,
+   age10:75,age20:115.3,age30:237.3,age40:329,age50:262.7,age60:212,
+   q_a40:681.7,q_tot:1414.7,q_r24:1.1178,q_1q:0.8347,
+   t_q_r24:1.2365,t_q_1q:0.8419,
+  x:1.3643,y:16,q1:1.0188,t6:1740,a6:832,qt:1414.7,qa:681.7,a_q_r24:1.1178,a_q_1q:0.8347},
+  {n:"동림점",sn:"동림",type:"우수",
+   a40_m:[172,135,256],tot_m:[570,422,689],
+   a_r24:[0.864,0.6781,1.2859],a_rm:[0.9198,0.7759,1.6516],a_1q:[0.6935,0.5444,1.0323],
+   t_r24:1.1362,t_rm:1.2564,t_1q:0.8012,a_r24_6:1.2859,a_rm_6:1.6516,a_1q_6:1.0323,
+   age10:50.3,age20:34.3,age30:48.7,age40:104.7,age50:102.3,age60:160,
+   q_a40:187.7,q_tot:560.3,q_r24:0.9427,q_1q:0.7567,
+   t_q_r24:1.1362,t_q_1q:0.8012,
+  x:1.2859,y:1.6516,q1:1.0323,t6:689,a6:256,qt:560.3,qa:187.7,a_q_r24:0.9427,a_q_1q:0.7567},
+  {n:"을지로점",sn:"을지",type:"24년 대비 성장",
+   a40_m:[630,527,726],tot_m:[1517,1242,1740],
+   a_r24:[1.468,1.228,1.6917],a_rm:[1.3519,1.4282,2.0625],a_1q:[0.8136,0.6806,0.9376],
+   t_r24:1.6465,t_rm:1.7917,t_1q:0.8452,a_r24_6:1.6917,a_rm_6:2.0625,a_1q_6:0.9376,
+   age10:55.7,age20:94.3,age30:229,age40:304.3,age50:269,age60:330.3,
+   q_a40:627.7,q_tot:1499.7,q_r24:1.4625,q_1q:0.8106,
+   t_q_r24:1.6465,t_q_1q:0.8452,
+  x:1.6917,y:2.0625,q1:0.9376,t6:1740,a6:726,qt:1499.7,qa:627.7,a_q_r24:1.4625,a_q_1q:0.8106},
+  {n:"광화문점",sn:"광화",type:"24년 대비 성장",
+   a40_m:[461,432,583],tot_m:[1110,989,1369],
+   a_r24:[0.9202,0.8623,1.1637],a_rm:[1.1271,0.9774,1.5464],a_1q:[0.7858,0.7364,0.9938],
+   t_r24:1.0358,t_rm:1.1788,t_1q:0.8749,a_r24_6:1.1637,a_rm_6:1.5464,a_1q_6:0.9938,
+   age10:53,age20:69.3,age30:183.7,age40:239,age50:233,age60:202.7,
+   q_a40:492,q_tot:1156,q_r24:0.982,q_1q:0.8386,
+   t_q_r24:1.0358,t_q_1q:0.8749,
+  x:1.1637,y:1.5464,q1:0.9938,t6:1369,a6:583,qt:1156,qa:492,a_q_r24:0.982,a_q_1q:0.8386},
+  {n:"전북대점",sn:"전북",type:"성장X",
+   a40_m:[184,246,244],tot_m:[438,504,548],
+   a_r24:[0.7143,0.955,0.9473],a_rm:[0.8106,1.0041,1.1961],a_1q:[0.6273,0.8386,0.8318],
+   t_r24:0.9109,t_rm:1.0219,t_1q:0.7376,a_r24_6:0.9473,a_rm_6:1.1961,a_1q_6:0.8318,
+   age10:25,age20:68,age30:76.7,age40:80,age50:88.3,age60:106.7,
+   q_a40:224.7,q_tot:496.7,q_r24:0.8722,q_1q:0.7659,
+   t_q_r24:0.9109,t_q_1q:0.7376,
+  x:0.9473,y:1.1961,q1:0.8318,t6:548,a6:244,qt:496.7,qa:224.7,a_q_r24:0.8722,a_q_1q:0.7659},
+  {n:"뱅뱅사거리점",sn:"뱅뱅",type:"성장X",
+   a40_m:[504,467,501],tot_m:[1084,992,1171],
+   a_r24:[0.6818,0.6318,0.6778],a_rm:[0.7059,0.6468,0.6456],a_1q:[0.9136,0.8465,0.9082],
+   t_r24:0.7881,t_rm:0.7873,t_1q:0.9288,a_r24_6:0.6778,a_rm_6:0.6456,a_1q_6:0.9082,
+   age10:36.7,age20:81,age30:168.7,age40:241,age50:187.3,age60:219,
+   q_a40:490.7,q_tot:1082.3,q_r24:0.6638,q_1q:0.8894,
+   t_q_r24:0.7881,t_q_1q:0.9288,
+  x:0.6778,y:0.6456,q1:0.9082,t6:1171,a6:501,qt:1082.3,qa:490.7,a_q_r24:0.6638,a_q_1q:0.8894},
+  {n:"수원스타필드점",sn:"수원",type:"24년 대비 성장",
+   a40_m:[356,351,463],tot_m:[827,945,1114],
+   a_r24:[1.1987,1.1818,1.5589],a_rm:[1.4531,1.5463,1.5802],a_1q:[0.5776,0.5695,0.7512],
+   t_r24:1.567,t_rm:1.7706,t_1q:0.6653,a_r24_6:1.5589,a_rm_6:1.5802,a_1q_6:0.7512,
+   age10:107.3,age20:80.7,age30:126,age40:183.3,age50:176.3,age60:170,
+   q_a40:390,q_tot:962,q_r24:1.3131,q_1q:0.6328,
+   t_q_r24:1.567,t_q_1q:0.6653,
+  x:1.5589,y:1.5802,q1:0.7512,t6:1114,a6:463,qt:962,qa:390,a_q_r24:1.3131,a_q_1q:0.6328},
+  {n:"일산본점",sn:"일산",type:"성장X",
+   a40_m:[448,461,475],tot_m:[1165,1231,1288],
+   a_r24:[0.8041,0.8274,0.8525],a_rm:[0.9333,0.8367,1.065],a_1q:[0.7026,0.7229,0.7449],
+   t_r24:0.961,t_rm:1.0052,t_1q:0.8111,a_r24_6:0.8525,a_rm_6:1.065,a_1q_6:0.7449,
+   age10:70,age20:100,age30:160.7,age40:200.7,age50:253.7,age60:283.7,
+   q_a40:461.3,q_tot:1228,q_r24:0.828,q_1q:0.7235,
+   t_q_r24:0.961,t_q_1q:0.8111,
+  x:0.8525,y:1.065,q1:0.7449,t6:1288,a6:475,qt:1228,qa:461.3,a_q_r24:0.828,a_q_1q:0.7235},
+  {n:"분당서현역점",sn:"분당",type:"우수",
+   a40_m:[336,332,468],tot_m:[909,901,1294],
+   a_r24:[0.868,0.8577,1.209],a_rm:[1.0769,0.7849,1.2124],a_1q:[0.7439,0.7351,1.0362],
+   t_r24:1.042,t_rm:1.107,t_1q:0.8958,a_r24_6:1.209,a_rm_6:1.2124,a_1q_6:1.0362,
+   age10:65.3,age20:71.7,age30:98.7,age40:208.3,age50:169.3,age60:280,
+   q_a40:378.7,q_tot:1034.7,q_r24:0.9783,q_1q:0.8384,
+   t_q_r24:1.042,t_q_1q:0.8958,
+  x:1.209,y:1.2124,q1:1.0362,t6:1294,a6:468,qt:1034.7,qa:378.7,a_q_r24:0.9783,a_q_1q:0.8384},
+  {n:"용산역점",sn:"용산",type:"24년 대비 성장",
+   a40_m:[393,332,369],tot_m:[796,656,903],
+   a_r24:[1.0849,0.9165,1.0186],a_rm:[1.1165,0.9765,1.3667],a_1q:[0.8403,0.7099,0.789],
+   t_r24:1.122,t_rm:1.2246,t_1q:0.8327,a_r24_6:1.0186,a_rm_6:1.3667,a_1q_6:0.789,
+   age10:31,age20:84.3,age30:127.7,age40:152.7,age50:124.3,age60:161.3,
+   q_a40:364.7,q_tot:785,q_r24:1.0067,q_1q:0.7798,
+   t_q_r24:1.122,t_q_1q:0.8327,
+  x:1.0186,y:1.3667,q1:0.789,t6:903,a6:369,qt:785,qa:364.7,a_q_r24:1.0067,a_q_1q:0.7798},
+  {n:"종로공평점",sn:"종로",type:"24년 대비 성장",
+   a40_m:[234,209,225],tot_m:[557,452,583],
+   a_r24:[1.1341,1.0129,1.0905],a_rm:[1.3073,1.0503,1.178],a_1q:[0.8397,0.75,0.8074],
+   t_r24:1.2192,t_rm:1.3311,t_1q:0.7889,a_r24_6:1.0905,a_rm_6:1.178,a_1q_6:0.8074,
+   age10:21.7,age20:24.7,age30:72.3,age40:125.7,age50:110.3,age60:95.7,
+   q_a40:222.7,q_tot:530.7,q_r24:1.0792,q_1q:0.799,
+   t_q_r24:1.2192,t_q_1q:0.7889,
+  x:1.0905,y:1.178,q1:0.8074,t6:583,a6:225,qt:530.7,qa:222.7,a_q_r24:1.0792,a_q_1q:0.799},
+  {n:"삼산점",sn:"삼산",type:"24년 대비 성장",
+   a40_m:[203,172,230],tot_m:[553,463,613],
+   a_r24:[0.9026,0.7647,1.0226],a_rm:[0.9186,0.8776,1.2921],a_1q:[0.6843,0.5798,0.7753],
+   t_r24:1.0905,t_rm:1.1652,t_1q:0.7058,a_r24_6:1.0226,a_rm_6:1.2921,a_1q_6:0.7753,
+   age10:32.3,age20:39,age30:70.3,age40:92.3,age50:97.7,age60:146.3,
+   q_a40:201.7,q_tot:543,q_r24:0.8966,q_1q:0.6798,
+   t_q_r24:1.0905,t_q_1q:0.7058,
+  x:1.0226,y:1.2921,q1:0.7753,t6:613,a6:230,qt:543,qa:201.7,a_q_r24:0.8966,a_q_1q:0.6798},
+  {n:"잠실롯데점",sn:"잠실",type:"성장X",
+   a40_m:[264,190,233],tot_m:[517,415,531],
+   a_r24:[1.0812,0.7782,0.9543],a_rm:[1.7143,0.9091,1.1148],a_1q:[0.8453,0.6083,0.746],
+   t_r24:0.9998,t_rm:1.2336,t_1q:0.7179,a_r24_6:0.9543,a_rm_6:1.1148,a_1q_6:0.746,
+   age10:36.3,age20:42.7,age30:84,age40:102.3,age50:64.7,age60:111,
+   q_a40:229,q_tot:487.7,q_r24:0.9379,q_1q:0.7332,
+   t_q_r24:0.9998,t_q_1q:0.7179,
+  x:0.9543,y:1.1148,q1:0.746,t6:531,a6:233,qt:487.7,qa:229,a_q_r24:0.9379,a_q_1q:0.7332},
+  {n:"청주지웰시티점",sn:"청주",type:"성장X",
+   a40_m:[411,364,430],tot_m:[991,945,1104],
+   a_r24:[0.9536,0.8445,0.9977],a_rm:[1.1879,1.04,1.2356],a_1q:[0.6915,0.6125,0.7235],
+   t_r24:1.0297,t_rm:1.2604,t_1q:0.7242,a_r24_6:0.9977,a_rm_6:1.2356,a_1q_6:0.7235,
+   age10:108.3,age20:82.3,age30:126,age40:193.3,age50:191,age60:189.7,
+   q_a40:401.7,q_tot:1013.3,q_r24:0.9319,q_1q:0.6758,
+   t_q_r24:1.0297,t_q_1q:0.7242,
+  x:0.9977,y:1.2356,q1:0.7235,t6:1104,a6:430,qt:1013.3,qa:401.7,a_q_r24:0.9319,a_q_1q:0.6758},
+  {n:"대학로점",sn:"대학",type:"24년 대비 성장",
+   a40_m:[216,196,252],tot_m:[547,525,605],
+   a_r24:[0.8588,0.7793,1.002],a_rm:[1,0.7656,1.1667],a_1q:[0.7696,0.6983,0.8979],
+   t_r24:1.0431,t_rm:1.0826,t_1q:0.8113,a_r24_6:1.002,a_rm_6:1.1667,a_1q_6:0.8979,
+   age10:27.3,age20:57.3,age30:55.3,age40:108.7,age50:94.7,age60:154.7,
+   q_a40:221.3,q_tot:559,q_r24:0.8801,q_1q:0.7886,
+   t_q_r24:1.0431,t_q_1q:0.8113,
+  x:1.002,y:1.1667,q1:0.8979,t6:605,a6:252,qt:559,qa:221.3,a_q_r24:0.8801,a_q_1q:0.7886},
+  {n:"수성센터",sn:"수성",type:"24년 대비 성장",
+   a40_m:[353,326,374],tot_m:[1336,1254,1371],
+   a_r24:[1.0633,0.9819,1.1265],a_rm:[1.0862,0.9645,1.1724],a_1q:[0.7537,0.6961,0.7986],
+   t_r24:1.3898,t_rm:1.4066,t_1q:0.8485,a_r24_6:1.1265,a_rm_6:1.1724,a_1q_6:0.7986,
+   age10:147.3,age20:82.3,age30:86.7,age40:182,age50:234.7,age60:379,
+   q_a40:351,q_tot:1320.3,q_r24:1.0572,q_1q:0.7495,
+   t_q_r24:1.3898,t_q_1q:0.8485,
+  x:1.1265,y:1.1724,q1:0.7986,t6:1371,a6:374,qt:1320.3,qa:351,a_q_r24:1.0572,a_q_1q:0.7495},
+  {n:"둔산본점",sn:"둔산",type:"성장X",
+   a40_m:[420,403,475],tot_m:[1304,1295,1399],
+   a_r24:[0.8742,0.8389,0.9887],a_rm:[0.9836,0.9951,1.0556],a_1q:[0.7204,0.6913,0.8148],
+   t_r24:1.0305,t_rm:1.1287,t_1q:0.7848,a_r24_6:0.9887,a_rm_6:1.0556,a_1q_6:0.8148,
+   age10:90.3,age20:84,age30:144.7,age40:204,age50:246.7,age60:395.3,
+   q_a40:432.7,q_tot:1332.7,q_r24:0.9006,q_1q:0.7421,
+   t_q_r24:1.0305,t_q_1q:0.7848,
+  x:0.9887,y:1.0556,q1:0.8148,t6:1399,a6:475,qt:1332.7,qa:432.7,a_q_r24:0.9006,a_q_1q:0.7421},
+  {n:"상남센터",sn:"상남",type:"성장X",
+   a40_m:[315,330,394],tot_m:[840,805,1070],
+   a_r24:[0.7271,0.7617,0.9094],a_rm:[0.9347,0.8505,1.113],a_1q:[0.7752,0.8121,0.9696],
+   t_r24:0.9004,t_rm:1.0074,t_1q:0.9123,a_r24_6:0.9094,a_rm_6:1.113,a_1q_6:0.9696,
+   age10:57.3,age20:77,age30:121,age40:148.3,age50:164.7,age60:234,
+   q_a40:346.3,q_tot:905,q_r24:0.7994,q_1q:0.8523,
+   t_q_r24:0.9004,t_q_1q:0.9123,
+  x:0.9094,y:1.113,q1:0.9696,t6:1070,a6:394,qt:905,qa:346.3,a_q_r24:0.7994,a_q_1q:0.8523},
+  {n:"구미확장단지점",sn:"구미",type:"24년 대비 성장",
+   a40_m:[175,149,233],tot_m:[375,370,509],
+   a_r24:[0.8502,0.7239,1.132],a_rm:[0.9563,0.8142,1.3468],a_1q:[0.6757,0.5753,0.8996],
+   t_r24:0.9717,t_rm:1.081,t_1q:0.7286,a_r24_6:1.132,a_rm_6:1.3468,a_1q_6:0.8996,
+   age10:67,age20:14.7,age30:55,age40:116,age50:55.3,age60:60,
+   q_a40:185.7,q_tot:418,q_r24:0.902,q_1q:0.7169,
+   t_q_r24:0.9717,t_q_1q:0.7286,
+  x:1.132,y:1.3468,q1:0.8996,t6:509,a6:233,qt:418,qa:185.7,a_q_r24:0.902,a_q_1q:0.7169},
+  {n:"양산점",sn:"양산",type:"우수",
+   a40_m:[140,174,208],tot_m:[542,522,599],
+   a_r24:[0.8537,1.061,1.2683],a_rm:[0.9459,1.2168,1.6911],a_1q:[0.7,0.87,1.04],
+   t_r24:1.2924,t_rm:1.4743,t_1q:0.9028,a_r24_6:1.2683,a_rm_6:1.6911,a_1q_6:1.04,
+   age10:71,age20:24,age30:47,age40:103,age50:92,age60:152,
+   q_a40:174,q_tot:554.3,q_r24:1.061,q_1q:0.87,
+   t_q_r24:1.2924,t_q_1q:0.9028,
+  x:1.2683,y:1.6911,q1:1.04,t6:599,a6:208,qt:554.3,qa:174,a_q_r24:1.061,a_q_1q:0.87},
+  {n:"무교점",sn:"무교",type:"성장X",
+   a40_m:[219,183,212],tot_m:[765,506,641],
+   a_r24:[1.0034,0.8385,0.9714],a_rm:[1.2443,0.6753,1.1459],a_1q:[0.7925,0.6622,0.7672],
+   t_r24:1.0475,t_rm:1.13,t_1q:0.7614,a_r24_6:0.9714,a_rm_6:1.1459,a_1q_6:0.7672,
+   age10:25.3,age20:29.7,age30:71.7,age40:103.3,age50:124,age60:126,
+   q_a40:204.7,q_tot:637.3,q_r24:0.9378,q_1q:0.7407,
+   t_q_r24:1.0475,t_q_1q:0.7614,
+  x:0.9714,y:1.1459,q1:0.7672,t6:641,a6:212,qt:637.3,qa:204.7,a_q_r24:0.9378,a_q_1q:0.7407},
+  {n:"명지점",sn:"명지",type:"24년 대비 성장",
+   a40_m:[350,256,379],tot_m:[806,730,1049],
+   a_r24:[1.0966,0.8021,1.1875],a_rm:[1.417,0.8767,1.5344],a_1q:[0.74,0.5412,0.8013],
+   t_r24:1.1767,t_rm:1.2778,t_1q:0.7765,a_r24_6:1.1875,a_rm_6:1.5344,a_1q_6:0.8013,
+   age10:124.7,age20:36.3,age30:108.7,age40:183.3,age50:102,age60:210.3,
+   q_a40:328.3,q_tot:861.7,q_r24:1.0287,q_1q:0.6942,
+   t_q_r24:1.1767,t_q_1q:0.7765,
+  x:1.1875,y:1.5344,q1:0.8013,t6:1049,a6:379,qt:861.7,qa:328.3,a_q_r24:1.0287,a_q_1q:0.6942}
+];
+
+var TS={"우수":{cls:"t-exc"},"24년 대비 성장":{cls:"t-grow"},"성장X":{cls:"t-lag"}};
+function fmt(v){return (v*100).toFixed(1)+"%";}
+function pill(v,base){var tol=0.05;var c=v>=base?"pg":v>=(base-tol)?"py":"pr";return "<span class='pill "+c+"'>"+fmt(v)+"</span>";}
+function colorV(v,b){return v>=b?"color:#3B6D11":v>=(b-0.05)?"color:#854F0B":"color:#A32D2D";}
+function rcTd(v,b){var num=parseFloat(v)/100;return "<td style='"+colorV(num,b)+";font-weight:600;'>"+v+"</td>";}
+function f2(v){return (v*100).toFixed(1)+"%";}
+
+/* 전역 숫자 레이블 플러그인 */
+Chart.register({
+  id:"customLbl",
+  afterDatasetsDraw:function(chart){
+    var opts=chart.options.plugins.customLbl;
+    if(!opts) return;
+    var c2=chart.ctx,meta0=chart.getDatasetMeta(0),meta1=chart.getDatasetMeta(1);
+    c2.save(); c2.font="bold 9.5px sans-serif"; c2.textAlign="center";
+    if(meta0&&meta0.data){meta0.data.forEach(function(bar,idx){
+      if(!opts.totM||opts.totM[idx]===undefined) return;
+      c2.fillStyle="rgba(30,100,200,.88)";
+      c2.fillText(opts.totM[idx],bar.x,bar.y-3);
+    });}
+    if(meta1&&meta1.data){meta1.data.forEach(function(pt,idx){
+      if(!opts.a40M||opts.a40M[idx]===undefined) return;
+      c2.fillStyle="#C0392B";
+      c2.fillText(opts.a40M[idx],pt.x,pt.y-7);
+    });}
+    c2.restore();
+  }
+});
+
+/* ── ③-1 소형 사분면 (6월Monthly용) — PS&M 9店만, 전체내방은 6월 단일월 실제값 사용 (tab1 전용 데이터, 분기탭과 무관) ── */
+var storesT6={
+  "김포고촌역점":{t6:641,t_r24_6:1.3521,t_rm_6:1.6824,t_1q_6:1.0767},
+  "탕정점":{t6:834,t_r24_6:1.7579,t_rm_6:2.0695,t_1q_6:0.9477},
+  "배곧신도시점":{t6:642,t_r24_6:1.1519,t_rm_6:1.2205,t_1q_6:0.7459},
+  "수완장덕점":{t6:1056,t_r24_6:1.0821,t_rm_6:1.4155,t_1q_6:0.9516},
+  "서면롯데점":{t6:1677,t_r24_6:1.1018,t_rm_6:1.1408,t_1q_6:0.9625},
+  "다사점":{t6:1106,t_r24_6:1.5463,t_rm_6:1.7955,t_1q_6:0.9722},
+  "신림역점":{t6:810,t_r24_6:1.0253,t_rm_6:1.2519,t_1q_6:0.9408},
+  "춘천명동점":{t6:450,t_r24_6:1.129,t_rm_6:1.1364,t_1q_6:0.8448},
+  "청라점":{t6:897,t_r24_6:1.1244,t_rm_6:1.3191,t_1q_6:0.8064}
+};
+stores.forEach(function(s,idx){
+  var t6=storesT6[s.n];
+  var w1=document.createElement("div"); w1.className="sm";
+  w1.innerHTML="<div class='sm-hd'>"
+    +"<span class='sm-name' style='font-size:11px;font-weight:700;'>"+s.n+"</span></div>"
+    +"<div style='position:relative;height:88px;overflow:hidden;'><canvas id='sc1_"+idx+"'></canvas></div>"
+    +"<div style='display:flex;gap:6px;font-size:10px;margin-top:3px;'>"
+    +"<span style='color:#378ADD;'>● "+fmt(t6.t_r24_6)+"/"+fmt(t6.t_rm_6)+"</span>"
+    +"<span style='color:#D85A30;'>■ "+fmt(s.a_r24_6)+"/"+fmt(s.a_rm_6)+"</span></div>";
+  document.getElementById("sg1").appendChild(w1);
+  (function(s,i,t6){setTimeout(function(){
+    var el=document.getElementById("sc1_"+i); if(!el) return;
+    var ch=new Chart(el.getContext("2d"),{type:"bubble",data:{datasets:[
+      {label:"전체",data:[{x:t6.t_r24_6,y:t6.t_rm_6,r:8}],backgroundColor:"rgba(56,138,221,.28)",borderColor:"#378ADD",borderWidth:1.5},
+      {label:"2040",data:[{x:s.a_r24_6,y:s.a_rm_6,r:8}],backgroundColor:"rgba(216,90,48,.28)",borderColor:"#D85A30",borderWidth:1.5,pointStyle:"rect"}
+    ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:6,right:6,bottom:4,left:4}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+": 평균比"+fmt(c.raw.x)+" 동월比"+fmt(c.raw.y);}}}},
+      scales:{x:{min:0.6,max:1.7,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:9},maxTicksLimit:4,callback:function(v){return(v*100).toFixed(0)+"%";}}},
+              y:{min:0.4,max:2.2,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:9},maxTicksLimit:4,callback:function(v){return(v*100).toFixed(0)+"%";}}}}}});
+    var orig=ch.draw.bind(ch);
+    ch.draw=function(){orig();
+      var c2=ch.ctx,ca=ch.chartArea,xs=ch.scales.x,ys=ch.scales.y; if(!ca) return;
+      c2.save(); c2.setLineDash([3,2]); c2.lineWidth=0.8;
+      c2.strokeStyle="rgba(29,158,117,.55)";
+      c2.beginPath();c2.moveTo(xs.getPixelForValue(DIR_R24),ca.top);c2.lineTo(xs.getPixelForValue(DIR_R24),ca.bottom);c2.stroke();
+      c2.beginPath();c2.moveTo(ca.left,ys.getPixelForValue(DIR_RMON));c2.lineTo(ca.right,ys.getPixelForValue(DIR_RMON));c2.stroke();
+      c2.strokeStyle="rgba(0,0,0,.15)";
+      c2.beginPath();c2.moveTo(xs.getPixelForValue(1.0),ca.top);c2.lineTo(xs.getPixelForValue(1.0),ca.bottom);c2.stroke();
+      c2.beginPath();c2.moveTo(ca.left,ys.getPixelForValue(1.0));c2.lineTo(ca.right,ys.getPixelForValue(1.0));c2.stroke();
+      c2.setLineDash([]); c2.restore();};
+    setTimeout(function(){ch.draw();},50);
+    if(!tabChartsM["t1"]) tabChartsM["t1"]=[];
+    tabChartsM["t1"].push(ch);
+  },160+i*40);})(s,idx,t6);
+});
+setTimeout(function(){
+  var psD=stores.map(function(s){return{x:s.a_r24_6,y:s.a_rm_6,r:Math.max(8,Math.round(s.a_1q_6*13))};});
+  var skD=skt.map(function(s){return{x:s.x,y:Math.min(s.y,2.2),r:5};});
+  var el=document.getElementById("m-quad"); if(!el) return;
+  var ch=new Chart(el.getContext("2d"),{type:"bubble",data:{datasets:[
+    {data:skD,backgroundColor:"rgba(140,140,140,.12)",borderColor:"rgba(100,100,100,.3)",borderWidth:1},
+    {data:psD,backgroundColor:"rgba(29,158,117,.22)",borderColor:"#1D9E75",borderWidth:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:32,right:28,bottom:12,left:12}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){
+      if(ctx.datasetIndex===0){var s=skt[ctx.dataIndex];return s.n+" | 24평균比:"+fmt(s.x)+" 동월比:"+fmt(s.y);}
+      var s=stores[ctx.dataIndex];return s.n+" | 24평균比:"+fmt(s.a_r24_6)+" 동월比:"+fmt(s.a_rm_6)+" 1Q比:"+fmt(s.a_1q_6);
+    }}}},
+    scales:{
+      x:{min:0.6,max:1.7,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:12},stepSize:0.1,callback:function(v){return(v*100).toFixed(0)+"%";}},
+         title:{display:true,text:"24년 평균 比 →",color:tc,font:{size:12},padding:{top:6}}},
+      y:{min:0.4,max:2.2,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:12},stepSize:0.2,callback:function(v){return(v*100).toFixed(0)+"%";}},
+         title:{display:true,text:"24년 동월 比 →",color:tc,font:{size:12},padding:{bottom:6}}}
+    }}});
+  var orig=ch.draw.bind(ch);
+  ch.draw=function(){
+    orig();
+    var c=ch.ctx,ca=ch.chartArea,xs=ch.scales.x,ys=ch.scales.y; if(!ca) return;
+    var px=xs.getPixelForValue(DIR_R24),py=ys.getPixelForValue(DIR_RMON);
+    var px100=xs.getPixelForValue(1.0),py100=ys.getPixelForValue(1.0);
+    c.save();
+    c.setLineDash([3,3]); c.strokeStyle="rgba(0,0,0,.18)"; c.lineWidth=1;
+    c.beginPath();c.moveTo(px100,ca.top);c.lineTo(px100,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,py100);c.lineTo(ca.right,py100);c.stroke();
+    // 직영 평균 기준선 (96.2% / 112.0%)
+    var pxJY=px, pyJY=py;
+    c.setLineDash([5,4]); c.strokeStyle="rgba(29,158,117,.85)"; c.lineWidth=2;
+    c.beginPath();c.moveTo(pxJY,ca.top);c.lineTo(pxJY,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,pyJY);c.lineTo(ca.right,pyJY);c.stroke();
+    c.setLineDash([]);
+    c.font="bold 10px sans-serif"; c.fillStyle="rgba(29,158,117,.9)";
+    c.fillText("★직영 96.2%",pxJY+3,ca.bottom-22);
+    c.fillText("★직영 112.0%",ca.left+4,pyJY-5);
+    // 100% 기준선
+    c.setLineDash([3,3]); c.strokeStyle="rgba(0,0,0,.2)"; c.lineWidth=1;
+    c.beginPath();c.moveTo(px100,ca.top);c.lineTo(px100,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,py100);c.lineTo(ca.right,py100);c.stroke();
+    c.setLineDash([]);
+    c.font="9px sans-serif"; c.fillStyle="rgba(0,0,0,.35)";
+    c.fillText("100%",px100+3,ca.top+10); c.fillText("100%",ca.left+3,py100-3);
+    c.font="bold 11px sans-serif";
+    c.fillStyle="rgba(20,90,50,.7)"; c.fillText("직영이상·동월↑",px+5,ca.top+16);
+    c.fillStyle="rgba(160,70,15,.7)"; c.fillText("직영이상·동월↓",px+5,ca.bottom-6);
+    c.fillStyle="rgba(20,60,160,.7)"; c.fillText("직영미만·동월↑",ca.left+5,ca.top+16);
+    c.fillStyle="rgba(150,20,20,.7)"; c.fillText("직영미만·동월↓",ca.left+5,ca.bottom-6);
+    stores.forEach(function(s){
+      var bx=xs.getPixelForValue(s.a_r24_6),by=ys.getPixelForValue(s.a_rm_6);
+      var r=Math.max(8,Math.round(s.a_1q_6*13));
+      c.font="11px sans-serif"; c.fillStyle="rgba(0,0,0,.78)";
+      var nm=s.sn; c.fillText(nm,bx-c.measureText(nm).width/2,by-r-4);
+    });
+    skt.forEach(function(s){
+      var bx=xs.getPixelForValue(s.x),by=ys.getPixelForValue(Math.min(s.y,2.2));
+      c.font="9px sans-serif"; c.fillStyle="rgba(100,100,100,.6)";
+      var nm=s.n.slice(0,4); c.fillText(nm,bx-c.measureText(nm).width/2,by-7);
+    });
+    c.restore();
+  };
+  setTimeout(function(){ch.draw();},100);
+},50);
+
+/* ── ④ 연령대 차트 (26년 6월 단일월, PS&M 9店) ── */
+setTimeout(function(){
+  var el=document.getElementById("agechart"); if(!el) return;
+  var ags=stores.map(function(s){return ageData[s.n].m6;});
+  var totals=stores.map(function(s){return s.tot_m[2];});
+  var etcs=ags.map(function(a,idx){return Math.max(0,Math.round(totals[idx]-(a.age10+a.age20+a.age30+a.age40+a.age50+a.age60)));});
+  var ageCh=new Chart(el.getContext("2d"),{type:"bar",data:{labels:stores.map(function(s){return s.n;}),datasets:[
+    {label:"10대",data:ags.map(function(a){return a.age10;}),backgroundColor:"#C5DFC5",stack:"a"},
+    {label:"20대",data:ags.map(function(a){return a.age20;}),backgroundColor:"#AECDE8",stack:"a"},
+    {label:"30대",data:ags.map(function(a){return a.age30;}),backgroundColor:"#A8C8B8",stack:"a"},
+    {label:"40대",data:ags.map(function(a){return a.age40;}),backgroundColor:"#E8B4A0",stack:"a"},
+    {label:"50대",data:ags.map(function(a){return a.age50;}),backgroundColor:"#C4B4D4",stack:"a"},
+    {label:"60대",data:ags.map(function(a){return a.age60;}),backgroundColor:"#B8B8B8",stack:"a"},
+    {label:"기타",data:etcs,backgroundColor:"#DDDDCC",stack:"a"}
+  ]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,layout:{padding:{right:48}},
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{x:{stacked:true,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:11}},title:{display:true,text:"내방 (명)",color:tc,font:{size:11}}},
+            y:{stacked:true,grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+  var origDraw=ageCh.draw.bind(ageCh);
+  ageCh.draw=function(){
+    origDraw();
+    var c=ageCh.ctx,ca=ageCh.chartArea; if(!ca) return;
+    c.save();
+    c.font="10px sans-serif"; c.textBaseline="middle"; c.textAlign="center";
+    ageCh.data.datasets.forEach(function(ds,di){
+      var meta=ageCh.getDatasetMeta(di);
+      meta.data.forEach(function(el,idx){
+        var v=ds.data[idx]; if(!v) return;
+        var props=el.getProps?el.getProps(["x","y","base","width"],true):el;
+        var cx=(props.x+props.base)/2, cy=props.y;
+        c.fillStyle=(di>=4)?"rgba(0,0,0,.72)":"rgba(0,0,0,.78)";
+        if(el.width>=14) c.fillText(Math.round(v),cx,cy);
+      });
+    });
+    var lastMeta=ageCh.getDatasetMeta(ageCh.data.datasets.length-1);
+    c.textAlign="left"; c.font="bold 11px sans-serif"; c.fillStyle="#1a1a1a";
+    lastMeta.data.forEach(function(el,idx){
+      var props=el.getProps?el.getProps(["x","y"],true):el;
+      c.fillText(Math.round(totals[idx])+"명",props.x+8,props.y);
+    });
+    c.restore();
+  };
+  ageCh.update();
+},220);
+
+/* ── ⑤ 참고도표 ── */
+var sktT6={
+  "IFC점":{t6:1740,t_r24_6:1.5209,t_rm_6:14.2623,t_1q_6:1.0355},
+  "동림점":{t6:689,t_r24_6:1.3971,t_rm_6:1.6805,t_1q_6:0.9852},
+  "을지로점":{t6:1740,t_r24_6:1.9103,t_rm_6:2.3108,t_1q_6:0.9807},
+  "광화문점":{t6:1369,t_r24_6:1.2267,t_rm_6:1.4929,t_1q_6:1.0361},
+  "전북대점":{t6:548,t_r24_6:1.005,t_rm_6:1.2287,t_1q_6:0.8139},
+  "뱅뱅사거리점":{t6:1171,t_r24_6:0.8526,t_rm_6:0.827,t_1q_6:1.0049},
+  "수원스타필드점":{t6:1114,t_r24_6:1.8146,t_rm_6:1.8723,t_1q_6:0.7704},
+  "일산본점":{t6:1288,t_r24_6:1.008,t_rm_6:1.2314,t_1q_6:0.8507},
+  "분당서현역점":{t6:1294,t_r24_6:1.3032,t_rm_6:1.4539,t_1q_6:1.1203},
+  "용산역점":{t6:903,t_r24_6:1.2906,t_rm_6:1.5569,t_1q_6:0.9579},
+  "종로공평점":{t6:583,t_r24_6:1.3395,t_rm_6:1.4835,t_1q_6:0.8667},
+  "삼산점":{t6:613,t_r24_6:1.2311,t_rm_6:1.39,t_1q_6:0.7968},
+  "잠실롯데점":{t6:531,t_r24_6:1.0887,t_rm_6:1.1959,t_1q_6:0.7816},
+  "청주지웰시티점":{t6:1104,t_r24_6:1.1219,t_rm_6:1.4469,t_1q_6:0.7889},
+  "대학로점":{t6:605,t_r24_6:1.1289,t_rm_6:1.2791,t_1q_6:0.8781},
+  "수성센터":{t6:1371,t_r24_6:1.4432,t_rm_6:1.5759,t_1q_6:0.8811},
+  "둔산본점":{t6:1399,t_r24_6:1.0818,t_rm_6:1.2134,t_1q_6:0.8239},
+  "상남센터":{t6:1070,t_r24_6:1.0646,t_rm_6:1.2145,t_1q_6:1.0786},
+  "구미확장단지점":{t6:509,t_r24_6:1.1833,t_rm_6:1.5378,t_1q_6:0.8873},
+  "양산점":{t6:599,t_r24_6:1.3965,t_rm_6:1.7114,t_1q_6:0.9756},
+  "무교점":{t6:641,t_r24_6:1.0536,t_rm_6:1.3815,t_1q_6:0.7658},
+  "명지점":{t6:1049,t_r24_6:1.4326,t_rm_6:1.6598,t_1q_6:0.9453},
+};
+var refRows=[];
+refRows.push({g:"dir",label:"직영 평균",t6:635,a6:198,t_r24:1.1486,t_rm:1.2892,t_1q:0.9143,a_r24:0.962,a_rm:1.1204,a_1q:0.8315});
+refRows.push({g:"avg",label:"31店 전체 평균",t6:969,a6:369,t_r24:1.2383,t_rm:1.4847,t_1q:0.9161,a_r24:1.0818,a_rm:1.314,a_1q:0.8633});
+refRows.push({g:"avg",label:"PS&M 9店 평균",t6:901,a6:303,t_r24:1.2099,t_rm:1.3833,t_1q:0.9186,a_r24:1,a_rm:1.1345,a_1q:0.8063});
+refRows.push({g:"avg",label:"SKT 22店 평균",t6:997,a6:389,t_r24:1.2491,t_rm:1.5261,t_1q:0.9152,a_r24:1.0907,a_rm:1.3582,a_1q:0.8672});
+stores.forEach(function(s){
+  var t6=storesT6[s.n];
+  refRows.push({g:"psm",label:s.n,
+    t6:t6.t6,a6:Math.round(s.a40_m[2]),
+    t_r24:t6.t_r24_6,t_rm:t6.t_rm_6,t_1q:t6.t_1q_6,a_r24:s.a_r24_6,a_rm:s.a_rm_6,a_1q:s.a_1q_6});
+});
+skt.forEach(function(s){
+  var t6=sktT6[s.n];
+  refRows.push({g:"skt",label:s.n,
+    t6:t6.t6,a6:s.a6,t_r24:t6.t_r24_6,t_rm:t6.t_rm_6,t_1q:t6.t_1q_6,a_r24:s.a_r24_6,a_rm:s.a_rm_6,a_1q:s.a_1q_6});
+});
+var sortKey="label",sortAsc=true;
+function blackTd(v){return "<td style='color:#111;font-weight:700;'>"+v+"</td>";}
+function renderRef(){
+  var fixed=refRows.filter(function(r){return r.g!=="psm"&&r.g!=="skt";});
+  var psm=refRows.filter(function(r){return r.g==="psm";});
+  var sk=refRows.filter(function(r){return r.g==="skt";});
+  function srt(arr){return arr.sort(function(a,b){var av=a[sortKey],bv=b[sortKey];if(typeof av==="number"&&typeof bv==="number") return sortAsc?av-bv:bv-av;return sortAsc?(av+"").localeCompare(bv+""):(bv+"").localeCompare(av+"");});}
+  var ordered=fixed.concat(srt(psm)).concat(srt(sk));
+  var tbl=document.getElementById("ref-table");
+  function sh(k,l){return "<th class='ref-sort"+(k==="tl"?" tl":"")+"' onclick='setSort(\""+k+"\")'>"+l+(sortKey===k?(sortAsc?" ▲":" ▼"):"")+"</th>";}
+  var h="<thead><tr>"+sh("label","매장")
+    +"<th colspan='4' style='border-left:1px solid #ddd;color:#378ADD;'>전체 내방</th>"
+    +"<th colspan='4' style='border-left:1px solid #ddd;color:#D85A30;'>2040 내방</th>"
+    +"</tr><tr><th class='tl'></th>"
+    +sh("t6","6월 내방객")+"<th>24평균比</th><th>24동월比</th><th>1Q比</th>"
+    +sh("a6","6월 내방객")+"<th>24평균比</th><th>24동월比</th><th>1Q比</th>"
+    +"</tr></thead><tbody>";
+  var psmDone=false,sktDone=false;
+  ordered.forEach(function(r){
+    if(r.g==="psm"&&!psmDone){h+="<tr><td colspan='9' style='padding:5px 9px;font-size:11px;font-weight:600;color:#1D9E75;background:#f0f8f4;border-top:1.5px solid #c8e8d8;'>▼ PS&amp;M 선정 매장 (9店)</td></tr>";psmDone=true;}
+    if(r.g==="skt"&&!sktDone){h+="<tr><td colspan='9' style='padding:5px 9px;font-size:11px;font-weight:600;color:#aaa;background:#f8f8f6;border-top:1.5px solid #e0e0e0;'>▼ SKT 선정 매장 (22店) — 참고</td></tr>";sktDone=true;}
+    var rc=r.g==="avg"?"avg-r":r.g==="dir"?"dir-r":r.g==="psm"?"psm-r":"";
+    var nc=r.g==="skt"?"nc-skt":"nc";
+    var isSummary=(r.g==="avg"||r.g==="dir");
+    h+="<tr class='"+rc+"'><td class='"+nc+"'"+(isSummary?" style=\"color:#111;font-weight:700;\"":"")+">"+r.label+"</td>"
+      +"<td style='border-left:1px solid #f0f0f0;"+(isSummary?"color:#111;font-weight:700;":"")+"'>"+(r.t6==="-"?"-":r.t6)+"</td>"
+      +(isSummary?blackTd(f2(r.t_r24))+blackTd(f2(r.t_rm))+blackTd(f2(r.t_1q)):rcTd(f2(r.t_r24),1.1486)+rcTd(f2(r.t_rm),1.2892)+rcTd(f2(r.t_1q),0.9143))
+      +"<td style='border-left:1px solid #f0f0f0;"+(isSummary?"color:#111;font-weight:700;":"")+"'>"+(r.a6==="-"?"-":r.a6)+"</td>"
+      +(isSummary?blackTd(f2(r.a_r24))+blackTd(f2(r.a_rm))+blackTd(f2(r.a_1q)):rcTd(f2(r.a_r24),DIR_R24)+rcTd(f2(r.a_rm),DIR_RMON)+rcTd(f2(r.a_1q),DIR_R1Q))
+      +"</tr>";
+  });
+  tbl.innerHTML=h+"</tbody>";
+}
+function setSort(k){if(sortKey===k){sortAsc=!sortAsc;}else{sortKey=k;sortAsc=false;}renderRef();}
+renderRef();
+
+
+/* ══════ 분기탭 렌더링 ══════ */
+var tabChartsQ={};
+
+/* ① 분기 KPI */
+var ageColors={age10:"#C5DFC5",age20:"#AECDE8",age30:"#A8C8B8",age40:"#E8B4A0",age50:"#C4B4D4",age60:"#B8B8B8"};
+
+var qKpiData=stores.map(function(s){
+  var d=ageData[s.n];
+  var avg=(d.m4.a40+d.m5.a40+d.m6.a40)/3;
+  var r24_avg=(s.a_r24[0]+s.a_r24[1]+s.a_r24[2])/3;
+  var r1q_avg=(s.a_1q[0]+s.a_1q[1]+s.a_1q[2])/3;
+  return {n:s.n,sn:s.sn,type:s.type,avg:avg,r24:r24_avg,r1q:r1q_avg};
+});
+
+var qEl=document.getElementById("q-kpi-row");
+if(qEl){
+  var abs_grow=qKpiData.filter(function(s){return s.r24>=1.0;});
+  var q1_grow=qKpiData.filter(function(s){return s.r1q>=1.0;});
+  var both_lag=qKpiData.filter(function(s){return s.r24<1.0&&s.r1q<1.0;});
+  qEl.innerHTML=
+      "<div class='q-kpi'>"
+        +"<div class='q-kpi-l' style='font-size:12px;color:#3B6D11;font-weight:600;'>24년 연평균比 26년 4~6월 평균 ≥ 100%<br><span style='font-weight:400;color:#888;font-size:11px;'>(절대성장 — 24년 대비 실질 성장)</span></div>"
+        +"<div class='q-kpi-v' style='color:#3B6D11;'>"+abs_grow.length+"<span style='font-size:16px;font-weight:400;color:#888;'> / 9店</span></div>"
+        +"<div class='q-kpi-sub'>"+( abs_grow.length>0
+          ? abs_grow.map(function(s){return "<span style='color:#3B6D11;'>✓</span> "+s.n+" ("+((s.r24*100).toFixed(1))+"%)";}).join('<br>')
+          : "<span style='color:#A32D2D;'>해당 없음</span>"
+        )+"</div>"
+      +"</div>"
+      +"<div class='q-kpi'>"
+        +"<div class='q-kpi-l' style='font-size:12px;color:#185FA5;font-weight:600;'>26년 1Q比 26년 4~6월 평균 ≥ 100%<br><span style='font-weight:400;color:#888;font-size:11px;'>(1Q 수준 성장 — 올해 초보다 올랐는가)</span></div>"
+        +"<div class='q-kpi-v' style='color:#185FA5;'>"+q1_grow.length+"<span style='font-size:16px;font-weight:400;color:#888;'> / 9店</span></div>"
+        +"<div class='q-kpi-sub'>"+( q1_grow.length>0
+          ? q1_grow.map(function(s){return "<span style='color:#185FA5;'>✓</span> "+s.n+" ("+((s.r1q*100).toFixed(1))+"%)";}).join('<br>')
+          : "<span style='color:#A32D2D;'>해당 없음</span>"
+        )+"</div>"
+      +"</div>"
+      +"<div class='q-kpi'>"
+        +"<div class='q-kpi-l' style='font-size:12px;color:#A32D2D;font-weight:600;'>두 기준 모두 미달 (24年比·1Q比 모두 &lt;100%)<br><span style='font-weight:400;color:#888;font-size:11px;'>(절대성장·1Q성장 모두 미달성)</span></div>"
+        +"<div class='q-kpi-v' style='color:#A32D2D;'>"+both_lag.length+"<span style='font-size:16px;font-weight:400;color:#888;'> / 9店</span></div>"
+        +"<div class='q-kpi-sub'>"+( both_lag.length>0
+          ? both_lag.map(function(s){return "<span style='color:#A32D2D;'>✗</span> "+s.n+" (24年:"+((s.r24*100).toFixed(1))+"% / 1Q:"+((s.r1q*100).toFixed(1))+"%)";}).join('<br>')
+          : "<span style='color:#3B6D11;'>모든 매장 최소 1개 기준 충족</span>"
+        )+"</div>"
+      +"</div>";
+}
+
+/* ② 매장별 활동 심층 진단 */
+var linkDataQ=[
+  {n:"김포고촌역점",sn:"김포",type:"우수",
+   act4:"VMD 신뢰기반 매장 개편 → 가족 동시 기변 4회선 달성",
+   act5:"신곡초 하교 동선 키즈폰 홍보(팝콘행사) + 당근 O2O(조회 19회 → 내방 7.3%) + SK매직 아파트 우편함 전단",
+   insight:"📌 꾸준 성장형 (113%→118%→130%). <strong>40대(73→97→102) 상승, 20대(59→55→68) 안정</strong>. 키즈폰 홍보로 초등학생 자녀를 둔 40대 학부모 유입 뚜렷. 분기 24평균比 121.9%로 9개 매장 중 유일 절대성장.",
+   ages:[{lbl:"20대",vals:[59,55,68],r24:1.903,r1q:1.726},{lbl:"30대",vals:[70,59,62],r24:1.066,r1q:0.986},{lbl:"40대",vals:[73,97,102],r24:1.075,r1q:1.016}]},
+  {n:"탕정점",sn:"탕정",type:"24년 대비 성장",
+   act4:"메가커피 제휴 가판 + 수폰세 케어 상담(MNP 2건·어린이신규 2건)",
+   act5:"메가커피 가판 반복(7.77초 이벤트) + 네이버클립·틱톡 숏폼 병행 + 즉석복권 이벤트",
+   insight:"📌 반등형 (110%→105%→143%). <strong>40대(144→142→226) 6월 급증, 30대(93→74→103) 6월 회복</strong>. 메가커피 가판이 점심·퇴근 시간대 3040 직장인·부모 접점 역할. 단, 20대(40→48→30) 6월 급감은 콘텐츠가 가족 타겟에 집중된 반작용.",
+   ages:[{lbl:"20대",vals:[40,48,30],r24:1.020,r1q:0.596},{lbl:"30대",vals:[93,74,103],r24:0.950,r1q:0.662},{lbl:"40대",vals:[144,142,226],r24:1.422,r1q:0.797}]},
+  {n:"배곧신도시점",sn:"배곧",type:"24년 대비 성장",
+   act4:"AI 캐릭터 '배롱이' + LED 배너 VMD → 블로그 조회 125% 상승",
+   act5:"배곧생명공원 나들이 가판(생수·필름교체권) + Btv Zone 아이·부모 분리 상담 + 로즈데이 감성 마케팅",
+   insight:"📌 반등형 (90%→88%→106%). <strong>40대(128→124→143) 완만 상승, 30대(54→62→87) 6월 확대</strong>. 공원 접점이 가족 고객 → MNP 2·기변 2·동판 1건으로 직결. 20대(46→39→41)는 정체 — SNS 채널 보완 필요.",
+   ages:[{lbl:"20대",vals:[46,39,41],r24:0.860,r1q:0.732},{lbl:"30대",vals:[54,62,87],r24:0.742,r1q:0.725},{lbl:"40대",vals:[128,124,143],r24:1.126,r1q:0.629}]},
+  {n:"수완장덕점",sn:"수완",type:"우수",
+   act4:"다이소 연계 뽑기 이벤트(30명 단골) + 이동형 멘트 활동",
+   act5:"어버이날·로즈데이 가판(타사 17+9명) + AI 블로그 자동화(1h→20분) + 스팟 매장 방문형 활동",
+   insight:"📌 반등형 (78%→77%→108%). <strong>30대(104→91→135)·40대(165→155→244) 6월 동반 상승</strong>. 이벤트가 30~40대 주부·가족 층 접점으로 효과적. 20대(57→72→71) 6월 소폭 하락, SNS 정기 콘텐츠 보완 필요.",
+   ages:[{lbl:"20대",vals:[57,72,71],r24:0.906,r1q:0.799},{lbl:"30대",vals:[104,91,135],r24:0.720,r1q:0.835},{lbl:"40대",vals:[165,155,244],r24:0.895,r1q:0.757}]},
+  {n:"서면롯데점",sn:"서면",type:"성장X",
+   act4:"2040 설문 기반 신뢰 포지셔닝 + 반짝 이벤트 단골 25명 + 카카오맵 3점→4.8점",
+   act5:"야호2040 가판 (1일 52명 단골) + AI 자격증 교육 (에이닷 노트, SUNO) + 스마트플레이스 신뢰 메시지",
+   insight:"📌 정체형 (106%→93%→103%). <strong>30대(185→167→186) 6월 회복, 40대(213→168→227) 반등</strong>. 야호2040 가판이 단 하루 52명으로 효과高. 20대(106→109→78) 6월 감소 — 60대 내방비중이 높아 2040 내방 유입 필요",
+   ages:[{lbl:"20대",vals:[106,109,78],r24:0.874,r1q:0.735},{lbl:"30대",vals:[185,167,186],r24:0.994,r1q:0.820},{lbl:"40대",vals:[213,168,227],r24:1.105,r1q:0.984}]},
+  {n:"다사점",sn:"다사",type:"24년 대비 성장",
+   act4:"솜사탕 나눔 이벤트 33건 + 당근 동네생활 조회 9→100명",
+   act5:"'찾아가서 다사게해' 캠페인 (뽑기→리플렛→친구맺기→매장 초청 4단계) + AI 무료교육 홍보",
+   insight:"📌 반등형 (104%→89%→107%). <strong>40대(127→126→176) 6월 반등</strong>. 솜사탕 캠페인이 40대 학부모 위주로 설계 → 30대(103→58→69) 감소. 20대(53→58→44) 6월 감소 — 2030 대상 내방유입 강화 필요",
+   ages:[{lbl:"20대",vals:[53,58,44],r24:0.835,r1q:0.777},{lbl:"30대",vals:[103,58,69],r24:0.920,r1q:0.575},{lbl:"40대",vals:[127,126,176],r24:1.050,r1q:0.683}]},
+  {n:"신림역점",sn:"신림역",type:"성장X",
+   act4:"온라인 마케팅 가독성 개선 + '최대 할인 솔루션' 컨설팅 메시지 전환",
+   act5:"카페형 프리스페이스 구축(5/20 완료) + SK매직 만화형 블로그 개선 (평균 사용시간 3분 23초, 재방문율↑)",
+   insight:"📌 2040 내방객 하락 후 반등 추세 (84%→66%→79%). <strong>20대(73→63→60) 지속 하락 — 24比 57.1%로 큰폭 감소</strong>. 30대(108→93→112)·40대(119→79→110) 소폭 회복세. 60대 비중 40% 이상으로 2040 내방 유입 필요. 프리스페이스 효과 가시화 7월~ 모니터링 필요.",
+   ages:[{lbl:"20대",vals:[73,63,60],r24:0.571,r1q:0.685},{lbl:"30대",vals:[108,93,112],r24:0.897,r1q:0.788},{lbl:"40대",vals:[119,79,110],r24:0.767,r1q:0.708}]},
+  {n:"춘천명동점",sn:"춘천",type:"성장X",
+   act4:"당근 나눔+고속충전기 가판 → 단골 43명, 기변 2·번이 1건",
+   act5:"점장 주도 병원·상가 방문 홍보(핸드크림 200개) + 캐릭터 '명동이' VMD + 당근 S26 특가 업로드",
+   insight:"📌 2040내방객 하락→회복 (101%→86%→97%). <strong>30대(46→27→27) 지속 감소</strong>. 40대(78→69→82) 6월 회복. 20대(36→41→45) 완만 증가. 상권 내 60대 점유율 40% 이상 — 2040 비율 개선 필요.",
+   ages:[{lbl:"20대",vals:[36,41,45],r24:0.844,r1q:0.950},{lbl:"30대",vals:[46,27,27],r24:0.643,r1q:0.664},{lbl:"40대",vals:[78,69,82],r24:1.073,r1q:0.712}]},
+  {n:"청라점",sn:"청라",type:"성장X",
+   act4:"열공 장학금 봉투 & 학원가 핀셋 마케팅 + 초중학생 등원 시간 17~19시 집중",
+   act5:"지식산업센터 홍보 & 감성 VMD + 부부의날 이벤트(가판 3h→75건 단골) + 트래블백 커플 패키지",
+   insight:"📌 반등형 (95%→89%→97%). <strong>30대(105→98→111) 6월 반등, 40대(188→161→184) 회복세</strong>. 학원가 장학금 봉투 콘셉트가 3040 학부모 접점으로 유효. 부부의날 가판 3시간 75건(자사30+타사45) 즉효성 확인. 20대(55→67→59) 비교적 안정적. 지식산업센터 B2B 확대 시 직장인 30대 추가 유입 가능.",
+   ages:[{lbl:"20대",vals:[55,67,59],r24:0.860,r1q:0.760},{lbl:"30대",vals:[105,98,111],r24:0.785,r1q:0.746},{lbl:"40대",vals:[188,161,184],r24:1.082,r1q:0.664}]}
+];
+
+var linkElQ=document.getElementById("link-grid");
+
+/* 매장별 태그·개선방향 */
+var storeMeta={
+  "김포고촌역점":{tags:["#키즈폰","#가족동반","#O2O전환","#꾸준성장"],next:"20·30대 직장인 SNS 접점 개발로 전 연령 균형 성장 추진"},
+  "탕정점":{tags:["#메가커피제휴","#숏폼콘텐츠","#40대급증","#오프라인+온라인"],next:"20대 콘텐츠 별도 설계 및 메가커피 가판 정기화로 6월 성과 유지"},
+  "배곧신도시점":{tags:["#공원접점","#가족분리상담","#감성마케팅","#직영근접"],next:"20대(46→39→41) 정체 해소 위해 SNS 채널·대학가 접점 신규 개발 필요"},
+  "수완장덕점":{tags:["#이벤트형","#로즈데이","#30·40대상승","#직영근접"],next:"20대(57→72→71) 변동성 안정화 위해 SNS 정기 콘텐츠 루틴 구축"},
+  "서면롯데점":{tags:["#가판즉효성","#AI교육","#20대이탈주의","#24년대비성장"],next:"20대 이탈 방어를 위한 예약 편의·당일 방문 전환 프로세스 강화"},
+  "다사점":{tags:["#솜사탕캠페인","#4단계전환","#30대 이탈","#직영근접"],next:"20대(53→58→44) 급감 방어 및 30대 직장인 대상 별도 접점 활동 설계"},
+  "신림역점":{tags:["#프리스페이스","#블로그개선","#회복필요"],next:"프리스페이스 효과 가시화(7월~) 모니터링 + 대학생·사회초년생 SNS 타겟 강화"},
+  "춘천명동점":{tags:["#관계형홍보","#캐릭터VMD","#30대지속감소","#회복필요"],next:"30·40대 방문 명분 재설계 필수 — 직장인 점심 가판·병원가 정기 방문 루틴화"},
+  "청라점":{tags:["#학원가마케팅","#장학금봉투","#부부의날","#직영근접"],next:"30대 회복 흐름 유지를 위해 학원가 홍보 정기화 및 지식산업센터 B2B 확대"}
+};
+/* ── HTML 저장 (키워드 반영) ── */
+// pendingTags: 저장 버튼 누르기 전까지 임시 보관
+var pendingTags={};
+
+function saveAsHTML(){
+  // pendingTags를 storeMeta에 반영
+  Object.keys(pendingTags).forEach(function(k){
+    if(storeMeta[k]) storeMeta[k].tags=pendingTags[k].slice();
+  });
+
+  // 현재 HTML 소스 가져오기
+  var src=document.documentElement.outerHTML;
+
+  // storeMeta 태그 부분을 현재 값으로 교체
+  Object.keys(storeMeta).forEach(function(k){
+    var tags=storeMeta[k].tags||[];
+    var tagsJson=JSON.stringify(tags);
+    var escaped=k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    var re=new RegExp('"'+escaped+'":\\{tags:\\[[^\\]]*\\]',"g");
+    src=src.replace(re,'"'+k+'":{tags:'+tagsJson+'');
+  });
+
+  var blob=new Blob([src],{type:"text/html;charset=utf-8"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  var d=new Date();
+  var stamp=d.getFullYear()+""+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  a.download="2040_TF_clarity_v5.8_"+stamp+".html";
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  // pendingTags 초기화 (저장 완료)
+  pendingTags={};
+
+  // 버튼 피드백
+  var btn=document.getElementById("save-html-btn");
+  if(btn){
+    btn.textContent="✅ 저장 완료!";
+    btn.style.background="#185FA5";
+    setTimeout(function(){
+      btn.innerHTML="💾 키워드 저장 (HTML 다운로드)";
+      btn.style.background="#1D9E75";
+    },2000);
+  }
+}
+/* ── 키워드 태그 편집 ── */
+function buildKtagWrap(sn,di){
+  var wrap=document.createElement("div");
+  wrap.id="kw_"+di;
+  wrap.style.cssText="margin-top:10px;";
+
+  // 원본 태그 (storeMeta 기준) — 수정 전 상태
+  var origTags=(storeMeta[sn]&&storeMeta[sn].tags)||[];
+  // 작업용 임시 복사본 (pendingTags에 저장)
+  if(!pendingTags[sn]) pendingTags[sn]=origTags.slice();
+
+  function render(){
+    wrap.innerHTML="";
+    var tags=pendingTags[sn]||[];
+
+    tags.forEach(function(t,ti){
+      (function(t,ti){
+        var sp=document.createElement("span");
+        sp.textContent=t;
+        sp.style.cssText="display:inline-block;background:#E6F1FB;color:#185FA5;"
+          +"border-radius:99px;font-size:11px;padding:2px 10px;margin:2px 2px 0;"
+          +"font-weight:600;cursor:pointer;";
+        sp.title="클릭하여 수정 (저장은 💾 버튼)";
+        sp.addEventListener("click",function(){ doEdit(sp,sn,ti,render); });
+        wrap.appendChild(sp);
+      })(t,ti);
+    });
+
+    // + 키워드 추가 버튼
+    var add=document.createElement("span");
+    add.textContent="＋ 키워드 추가";
+    add.style.cssText="display:inline-block;background:#f5f5f3;color:#aaa;"
+      +"border:1px dashed #ddd;border-radius:99px;font-size:11px;"
+      +"padding:2px 10px;margin:2px;cursor:pointer;";
+    add.addEventListener("click",function(){
+      if(!pendingTags[sn]) pendingTags[sn]=[];
+      pendingTags[sn].push("#새키워드");
+      render();
+      var spans=wrap.querySelectorAll("span");
+      if(spans.length>1) setTimeout(function(){ spans[spans.length-2].click(); },40);
+    });
+    wrap.appendChild(add);
+
+    // 미저장 변경사항 있으면 버튼 강조
+    updateSaveBtn();
+  }
+
+  render();
+  return wrap;
+}
+
+function doEdit(sp,sn,ti,onDone){
+  var orig=sp.textContent;
+  var inp=document.createElement("input");
+  inp.value=orig;
+  inp.style.cssText="display:inline-block;background:#E6F1FB;color:#185FA5;"
+    +"border:1.5px solid #185FA5;border-radius:99px;font-size:11px;"
+    +"padding:1px 10px;margin:1px;font-weight:600;outline:none;"
+    +"width:"+Math.max(orig.length*9,60)+"px;box-sizing:content-box;";
+  sp.replaceWith(inp);
+  inp.focus(); inp.select();
+
+  var done=false;
+  function finish(){
+    if(done) return; done=true;
+    var v=inp.value.trim();
+    if(v===""){
+      // 빈칸 = 삭제
+      if(pendingTags[sn]) pendingTags[sn].splice(ti,1);
+    } else {
+      if(!v.startsWith("#")) v="#"+v;
+      if(pendingTags[sn]) pendingTags[sn][ti]=v;
+    }
+    onDone(); // storeMeta 건드리지 않고 화면만 갱신
+  }
+  inp.addEventListener("blur",finish);
+  inp.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){ e.preventDefault(); inp.blur(); }
+    if(e.key==="Escape"){ done=true; onDone(); } // 취소: 원래값 복원
+  });
+}
+
+function updateSaveBtn(){
+  var btn=document.getElementById("save-html-btn");
+  if(!btn) return;
+  // pendingTags와 storeMeta 비교해서 변경사항 있으면 강조
+  var changed=Object.keys(pendingTags).some(function(k){
+    return JSON.stringify(pendingTags[k])!==JSON.stringify((storeMeta[k]&&storeMeta[k].tags)||[]);
+  });
+  if(changed){
+    btn.innerHTML="💾 키워드 저장 (HTML 다운로드) <span style='background:#fff3cd;color:#856404;border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px;'>미저장</span>";
+    btn.style.background="#E8A800";
+    btn.style.color="#1a1a1a";
+  } else {
+    btn.innerHTML="💾 키워드 저장 (HTML 다운로드)";
+    btn.style.background="#1D9E75";
+    btn.style.color="#fff";
+  }
+}
+
+var diagIdx=0;
+if(linkElQ){
+  linkDataQ.forEach(function(d){
+    var a20=d.ages.find(function(a){return a.lbl==="20대";})||{lbl:"20대",vals:["-","-","-"]};
+    var a30=d.ages.find(function(a){return a.lbl==="30대";})||{lbl:"30대",vals:["-","-","-"]};
+    var a40=d.ages.find(function(a){return a.lbl==="40대";})||{lbl:"40대",vals:["-","-","-"]};
+
+    function ageSum(a){
+      if(a.vals[0]==="-") return "-";
+      return Math.round(a.vals[0]+a.vals[1]+a.vals[2]);
+    }
+    function ageAvg(a){
+      if(a.vals[0]==="-") return "-";
+      return Math.round((a.vals[0]+a.vals[1]+a.vals[2])/3)+"명";
+    }
+    // 24평균比: 분기평균 / 24년평균 — 근사치 (stores에서 전체 r24 사용, 연령대별은 참고)
+    // 1Q比: 분기평균 / 1Q평균
+    var storeRef=stores.find(function(s){return s.n===d.n;})||{};
+    var qr24=storeRef.q_r24?((storeRef.q_r24*100).toFixed(1)+"%"):"—";
+    var q1q=storeRef.q_1q?((storeRef.q_1q*100).toFixed(1)+"%"):"—";
+    var qr24c=storeRef.q_r24?(storeRef.q_r24>=0.8742?"#3B6D11":storeRef.q_r24>=0.8242?"#854F0B":"#A32D2D"):"#888";
+    var q1qc=storeRef.q_1q?(storeRef.q_1q>=0.7556?"#3B6D11":storeRef.q_1q>=0.7056?"#854F0B":"#A32D2D"):"#888";
+
+    // 2040 합산 내방 (20+30+40대 합)
+    var sum2040=0;
+    [a20,a30,a40].forEach(function(a){
+      if(a.vals[0]!=="-") sum2040+=(a.vals[0]+a.vals[1]+a.vals[2]);
+    });
+    var avg2040=sum2040>0?(sum2040/3).toFixed(1):"—";
+
+    // 2040 전체(stores) 분기평균
+    var storeAvg2040=storeRef.q_a40?Math.round(storeRef.q_a40)+"명":"—";
+
+    var card=document.createElement("div"); card.className="link-card";
+    card.innerHTML="<div class='link-card-hd'>"
+      +"<span class='link-store' style='font-size:14px;font-weight:700;'>"+d.n+"</span>"
+      +"<span style='margin-left:auto;font-size:12px;'>"
+      +"<span style='color:"+qr24c+";font-weight:700;'>24평균比 "+qr24+"</span>"
+      +"<span style='margin:0 6px;color:#ddd;'>|</span>"
+      +"<span style='color:"+q1qc+";font-weight:700;'>1Q比 "+q1q+"</span>"
+      +"<span style='margin-left:8px;font-size:11px;color:#888;'>2040 4~6월 평균 <strong style='color:#1a1a1a;'>"+storeAvg2040+"</strong></span>"
+      +"</span></div>"
+
+      // 핵심 연령대 수치 테이블 (4→6변화 제거, 24比·1Q比 추가)
+      +"<div style='background:#f8f8f6;border-radius:7px;padding:10px 12px;margin-bottom:10px;'>"
+      +"<div style='font-size:11px;color:#888;margin-bottom:7px;font-weight:600;'>핵심 연령대 내방 (4월 / 5월 / 6월 · 명) — 직영 2040 4~6월 평균 기준: 24년 평균比 87.4% · 1Q比 75.6%</div>"
+      +"<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+      +"<thead><tr style='border-bottom:1.5px solid #e0e0e0;background:#f0f0ee;'>"
+      +"<th style='text-align:left;padding:4px 8px;font-weight:600;color:#555;'>연령</th>"
+      +"<th style='text-align:center;padding:4px 6px;color:#378ADD;'>4월</th>"
+      +"<th style='text-align:center;padding:4px 6px;color:#378ADD;'>5월</th>"
+      +"<th style='text-align:center;padding:4px 6px;color:#378ADD;'>6월</th>"
+      +"<th style='text-align:center;padding:4px 6px;font-weight:700;'>합계</th>"
+      +"<th style='text-align:center;padding:4px 6px;font-weight:700;color:#3B6D11;'>4~6월 평균</th>"
+      +"<th style='text-align:center;padding:4px 5px;font-weight:700;font-size:11px;color:#1D9E75;border-left:1px solid #e8e8e8;'>24년<br>평균比</th>"
+      +"<th style='text-align:center;padding:4px 5px;font-weight:700;font-size:11px;color:#854F0B;'>1Q<br>比</th>"
+      +"<th style='text-align:center;padding:4px 4px;font-weight:400;font-size:10px;color:#bbb;border-left:1px solid #f0f0f0;'>직영<br>24比</th>"
+      +"<th style='text-align:center;padding:4px 4px;font-weight:400;font-size:10px;color:#bbb;'>직영<br>1Q比</th>"
+      +"</tr></thead><tbody>"
+      +"<tr style='border-bottom:.5px solid #f0f0f0;'>"
+      +"<td style='padding:5px 8px;font-weight:700;color:#5BA8D8;'>20대</td>"
+      +"<td style='text-align:center;'>"+a20.vals[0]+"</td><td style='text-align:center;'>"+a20.vals[1]+"</td><td style='text-align:center;font-weight:700;'>"+a20.vals[2]+"</td>"
+      +"<td style='text-align:center;font-weight:700;'>"+ageSum(a20)+"</td>"
+      +"<td style='text-align:center;font-weight:700;color:#3B6D11;'>"+ageAvg(a20)+"</td>"
+      +"<td style='text-align:center;font-size:12px;border-left:1px solid #f0f0f0;'>"
+      +(a20.r24?"<span class='pill "+(a20.r24>=0.778?'pg':a20.r24>=0.728?'py':'pr')+"'>"+Math.round(a20.r24*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:12px;'>"
+      +(a20.r1q?"<span class='pill "+(a20.r1q>=0.733?'pg':a20.r1q>=0.683?'py':'pr')+"'>"+Math.round(a20.r1q*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;border-left:1px solid #f4f4f4;line-height:1.4;'>77.8%</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;line-height:1.4;'>73.3%</td>"
+      +"</tr>"
+      +"<tr style='border-bottom:.5px solid #f0f0f0;'>"
+      +"<td style='padding:5px 8px;font-weight:700;color:#60A898;'>30대</td>"
+      +"<td style='text-align:center;'>"+a30.vals[0]+"</td><td style='text-align:center;'>"+a30.vals[1]+"</td><td style='text-align:center;font-weight:700;'>"+a30.vals[2]+"</td>"
+      +"<td style='text-align:center;font-weight:700;'>"+ageSum(a30)+"</td>"
+      +"<td style='text-align:center;font-weight:700;color:#3B6D11;'>"+ageAvg(a30)+"</td>"
+      +"<td style='text-align:center;font-size:12px;border-left:1px solid #f0f0f0;'>"+(a30.r24?"<span class='pill "+(a30.r24>=0.819?'pg':a30.r24>=0.769?'py':'pr')+"'>"+Math.round(a30.r24*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:12px;'>"+(a30.r1q?"<span class='pill "+(a30.r1q>=0.762?'pg':a30.r1q>=0.712?'py':'pr')+"'>"+Math.round(a30.r1q*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;border-left:1px solid #f4f4f4;line-height:1.4;'>81.9%</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;line-height:1.4;'>76.2%</td>"
+      +"</tr>"
+      +"<tr style='border-bottom:1.5px solid #e0e0e0;'>"
+      +"<td style='padding:5px 8px;font-weight:700;color:#D87B5A;'>40대</td>"
+      +"<td style='text-align:center;'>"+a40.vals[0]+"</td><td style='text-align:center;'>"+a40.vals[1]+"</td><td style='text-align:center;font-weight:700;'>"+a40.vals[2]+"</td>"
+      +"<td style='text-align:center;font-weight:700;'>"+ageSum(a40)+"</td>"
+      +"<td style='text-align:center;font-weight:700;color:#3B6D11;'>"+ageAvg(a40)+"</td>"
+      +"<td style='text-align:center;font-size:12px;border-left:1px solid #f0f0f0;'>"+(a40.r24?"<span class='pill "+(a40.r24>=0.963?'pg':a40.r24>=0.913?'py':'pr')+"'>"+Math.round(a40.r24*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:12px;'>"+(a40.r1q?"<span class='pill "+(a40.r1q>=0.761?'pg':a40.r1q>=0.711?'py':'pr')+"'>"+Math.round(a40.r1q*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;border-left:1px solid #f4f4f4;line-height:1.4;'>96.3%</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;line-height:1.4;'>76.1%</td>"
+      +"</tr>"
+      +"<tr style='background:#eef6f3;font-weight:700;'>"
+      +"<td style='padding:5px 8px;font-weight:700;color:#1D9E75;'>2040 전체</td>"
++"<td style='text-align:center;font-weight:700;color:#1D9E75;font-size:13px;'>"
+      +(function(){
+        var v=0;
+        if(a20.vals[0]!=='-') v+=Number(a20.vals[0]);
+        if(a30.vals[0]!=='-') v+=Number(a30.vals[0]);
+        if(a40.vals[0]!=='-') v+=Number(a40.vals[0]);
+        return v>0?Math.round(v)+'명':'-';
+      })()+"</td>"
++"<td style='text-align:center;font-weight:700;color:#1D9E75;font-size:13px;'>"
+      +(function(){
+        var v=0;
+        if(a20.vals[1]!=='-') v+=Number(a20.vals[1]);
+        if(a30.vals[1]!=='-') v+=Number(a30.vals[1]);
+        if(a40.vals[1]!=='-') v+=Number(a40.vals[1]);
+        return v>0?Math.round(v)+'명':'-';
+      })()+"</td>"
++"<td style='text-align:center;font-weight:700;color:#1D9E75;font-size:13px;'>"
+      +(function(){
+        var v=0;
+        if(a20.vals[2]!=='-') v+=Number(a20.vals[2]);
+        if(a30.vals[2]!=='-') v+=Number(a30.vals[2]);
+        if(a40.vals[2]!=='-') v+=Number(a40.vals[2]);
+        return v>0?Math.round(v)+'명':'-';
+      })()+"</td>"
+      +"<td style='text-align:center;font-weight:700;font-size:14px;color:#1D9E75;'>"+sum2040+"명</td>"
+      +"<td style='text-align:center;font-weight:700;font-size:14px;color:#1D9E75;'>"+storeAvg2040+"</td>"
+      +"<td style='text-align:center;font-size:12px;border-left:1px solid #f0f0f0;'>"+(storeRef.q_r24?"<span class='pill "+(storeRef.q_r24>=0.8742?'pg':storeRef.q_r24>=0.8242?'py':'pr')+"'>"+Math.round(storeRef.q_r24*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:12px;'>"+(storeRef.q_1q?"<span class='pill "+(storeRef.q_1q>=0.7556?'pg':storeRef.q_1q>=0.7056?'py':'pr')+"'>"+Math.round(storeRef.q_1q*1000)/10+"%</span>":"—")+"</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;border-left:1px solid #f4f4f4;line-height:1.4;'>87.4%</td>"
+      +"<td style='text-align:center;font-size:10px;color:#ccc;line-height:1.4;'>75.6%</td>"
+      +"</tr>"
+      +"</tbody></table></div>"
+
+      +"<div class='link-act' style='margin-bottom:6px;'><div class='link-act-lbl' style='font-size:12px;'>4월 주요 활동</div><div style='font-size:12px;color:#555;line-height:1.6;'>"+d.act4+"</div></div>"
+      +"<div class='link-act'><div class='link-act-lbl' style='font-size:12px;'>5~6월 주요 활동</div><div style='font-size:12px;color:#555;line-height:1.6;'>"+d.act5+"</div></div>"
+      +"<div style='font-size:12px;color:#1D9E75;background:#f0f8f4;border-radius:6px;padding:8px 12px;margin-top:10px;line-height:1.7;position:relative;' id='diag_"+diagIdx+"'>"
+      +"<button class='edit-btn' id='ebtn_"+diagIdx+"' onclick=\'toggleInlineEdit("+diagIdx+")\'><span style=\'margin-right:3px;\'>✏️</span>수정</button>"
+      +"<strong style='font-size:13px;'>💡 심층 진단</strong><br><span id='diagText_"+diagIdx+"'>"+d.insight+"</span>"
+      +"<textarea id='diagTA_"+diagIdx+"' style='display:none;width:100%;margin-top:8px;min-height:90px;border:1.5px solid #1D9E75;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;'></textarea>"
+      +"<div id='diagSave_"+diagIdx+"' style='display:none;text-align:right;margin-top:6px;gap:6px;display:none;'>"
+      +"<button onclick=\'saveInline("+diagIdx+")\'  style=\'background:#1D9E75;color:#fff;border:none;border-radius:5px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-left:6px;\'>저장</button>"
+      +"<button onclick=\'cancelInline("+diagIdx+")\' style=\'background:#f0f0ee;color:#555;border:none;border-radius:5px;padding:5px 10px;font-size:12px;cursor:pointer;\'>취소</button></div></div>"
+
+      // 키워드 태그 — 플레이스홀더
+      +(function(){
+        return "<div class='ktag-ph' data-sn='"+d.n+"' data-di='"+diagIdx+"'></div>";
+      })();
+    diagIdx++;
+    linkElQ.appendChild(card);
+    // 플레이스홀더 → DOM 즉시 교체
+    var _ph=card.querySelector(".ktag-ph");
+    if(_ph){
+      var _kw=buildKtagWrap(_ph.getAttribute("data-sn"),_ph.getAttribute("data-di"));
+      _ph.parentNode.replaceChild(_kw,_ph);
+    }
+  });
+}
+
+/* ③ 분기 4분면 - X=24평균比(분기평균), Y=1Q比(분기평균) */
+var DIR_Q_R24=1.0, DIR_Q_1Q=1.0;
+var JY_Q_R24=0.8742, JY_Q_1Q=0.7556; // 직영 평균 기준선(26년4~6월 최종)
+setTimeout(function(){
+  var el=document.getElementById("q-quad"); if(!el) return;
+  var psD=stores.map(function(s){return{x:s.q_r24,y:s.q_1q,r:12};});
+  var skD=skt.map(function(s){return{x:s.q_r24,y:s.q_1q,r:5};});
+  var ch=new Chart(el.getContext("2d"),{type:"bubble",data:{datasets:[
+    {data:skD,backgroundColor:"rgba(140,140,140,.12)",borderColor:"rgba(100,100,100,.3)",borderWidth:1},
+    {data:psD,backgroundColor:"rgba(29,158,117,.22)",borderColor:"#1D9E75",borderWidth:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:32,right:28,bottom:12,left:12}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){
+      if(ctx.datasetIndex===0){var s=skt[ctx.dataIndex];return s.n+" | 24평균比:"+fmt(s.q_r24)+" 1Q比:"+fmt(s.q_1q);}
+      var s=stores[ctx.dataIndex];return s.n+" | 24평균比:"+fmt(s.q_r24)+" 1Q比:"+fmt(s.q_1q);
+    }}}},
+    scales:{
+      x:{min:0.4,max:1.5,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:12},stepSize:0.1,callback:function(v){return(v*100).toFixed(0)+"%";}},
+         title:{display:true,text:"24년 평균比 (분기합산 평균) →",color:tc,font:{size:12},padding:{top:6}}},
+      y:{min:0.4,max:1.4,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:12},stepSize:0.1,callback:function(v){return(v*100).toFixed(0)+"%";}},
+         title:{display:true,text:"26년 1Q比 (분기합산 평균) →",color:tc,font:{size:12},padding:{bottom:6}}}
+    }}});
+  var orig=ch.draw.bind(ch);
+  ch.draw=function(){
+    orig();
+    var c=ch.ctx,ca=ch.chartArea,xs=ch.scales.x,ys=ch.scales.y; if(!ca) return;
+    var px=xs.getPixelForValue(DIR_Q_R24),py=ys.getPixelForValue(DIR_Q_1Q);
+    var px100=xs.getPixelForValue(1.0),py100=ys.getPixelForValue(1.0);
+    c.save();
+    c.setLineDash([3,3]); c.strokeStyle="rgba(0,0,0,.18)"; c.lineWidth=1;
+    c.beginPath();c.moveTo(px100,ca.top);c.lineTo(px100,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,py100);c.lineTo(ca.right,py100);c.stroke();
+    // 직영 평균 기준선 (87.4% / 75.6%)
+    var pxJY=xs.getPixelForValue(JY_Q_R24), pyJY=ys.getPixelForValue(JY_Q_1Q);
+    c.setLineDash([5,4]); c.strokeStyle="rgba(29,158,117,.85)"; c.lineWidth=2;
+    c.beginPath();c.moveTo(pxJY,ca.top);c.lineTo(pxJY,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,pyJY);c.lineTo(ca.right,pyJY);c.stroke();
+    c.setLineDash([]);
+    c.font="bold 10px sans-serif"; c.fillStyle="rgba(29,158,117,.9)";
+    c.fillText("★직영 87.4%",pxJY+3,ca.bottom-22);
+    c.fillText("★직영 75.6%",ca.left+4,pyJY-5);
+    // 100% 기준선
+    c.setLineDash([3,3]); c.strokeStyle="rgba(0,0,0,.2)"; c.lineWidth=1;
+    c.beginPath();c.moveTo(px100,ca.top);c.lineTo(px100,ca.bottom);c.stroke();
+    c.beginPath();c.moveTo(ca.left,py100);c.lineTo(ca.right,py100);c.stroke();
+    c.setLineDash([]);
+    c.font="9px sans-serif"; c.fillStyle="rgba(0,0,0,.35)";
+    c.fillText("100%",px100+3,ca.top+10); c.fillText("100%",ca.left+3,py100-3);
+    c.fillStyle="rgba(20,90,50,.7)"; c.fillText("24년+1Q 모두 성장",px+5,ca.top+16);
+    c.fillStyle="rgba(160,70,15,.7)"; c.fillText("24년 성장·1Q 미달",px+5,ca.bottom-6);
+    c.fillStyle="rgba(20,60,160,.7)"; c.fillText("24년 역성장·1Q 성장",ca.left+5,ca.top+16);
+    c.fillStyle="rgba(150,20,20,.7)"; c.fillText("24년+1Q 모두 역성장",ca.left+5,ca.bottom-6);
+    stores.forEach(function(s){
+      var bx=xs.getPixelForValue(s.q_r24),by=ys.getPixelForValue(s.q_1q);
+      c.font="bold 11px sans-serif"; c.fillStyle="rgba(0,0,0,.82)";
+      var nm=s.n; c.fillText(nm,bx-c.measureText(nm).width/2,by-14);
+    });
+    skt.forEach(function(s){
+      var bx=xs.getPixelForValue(s.q_r24),by=ys.getPixelForValue(s.q_1q);
+      c.font="9px sans-serif"; c.fillStyle="rgba(100,100,100,.6)";
+      var nm=s.n.slice(0,4); c.fillText(nm,bx-c.measureText(nm).width/2,by-7);
+    });
+    c.restore();
+  };
+  setTimeout(function(){ch.draw();},100);
+},60);
+
+/* ④ 분기탭 — 사분면 소형차트 (qsg1) — X=24평균比분기, Y=1Q比분기 — PS&M 9개 매장만 */
+stores.forEach(function(s,idx){
+  var w1=document.createElement("div"); w1.className="sm";
+  w1.innerHTML="<div class='sm-hd'>"
+    +"<span class='sm-name' style='font-size:11px;font-weight:700;'>"+s.n+"</span></div>"
+    +"<div style='position:relative;height:88px;overflow:hidden;'><canvas id='qs1_"+idx+"'></canvas></div>"
+    +"<div style='display:flex;gap:8px;font-size:10px;margin-top:3px;flex-wrap:wrap;'>"
+    +"<span style='color:#378ADD;font-weight:600;'>● 전체 "+fmt(s.t_q_r24)+"/"+fmt(s.t_q_1q)+"</span>"
+    +"<span style='color:#D85A30;font-weight:600;'>■ 2040 "+fmt(s.q_r24)+"/"+fmt(s.q_1q)+"</span></div>";
+  var el=document.getElementById("qsg1"); if(el) el.appendChild(w1);
+  (function(s,i){setTimeout(function(){
+    var el=document.getElementById("qs1_"+i); if(!el) return;
+    var ch=new Chart(el.getContext("2d"),{type:"bubble",data:{datasets:[
+      {label:"전체",data:[{x:s.t_q_r24,y:s.t_q_1q,r:8}],backgroundColor:"rgba(56,138,221,.28)",borderColor:"#378ADD",borderWidth:1.5},
+      {label:"2040",data:[{x:s.q_r24,y:s.q_1q,r:9}],backgroundColor:"rgba(216,90,48,.28)",borderColor:"#D85A30",borderWidth:1.5,pointStyle:"rect"}
+    ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:6,right:6,bottom:4,left:4}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+": 24평균比"+fmt(c.raw.x)+" 1Q比"+fmt(c.raw.y);}}}},
+      scales:{x:{min:0.4,max:1.5,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:9},maxTicksLimit:4,callback:function(v){return(v*100).toFixed(0)+"%";}}},
+              y:{min:0.4,max:1.4,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:9},maxTicksLimit:4,callback:function(v){return(v*100).toFixed(0)+"%";}}}}}});
+    var orig=ch.draw.bind(ch);
+    ch.draw=function(){orig();
+      var c2=ch.ctx,ca=ch.chartArea,xs=ch.scales.x,ys=ch.scales.y; if(!ca) return;
+      c2.save(); c2.setLineDash([3,2]); c2.lineWidth=0.8;
+      c2.strokeStyle="rgba(150,150,150,.6)";
+      c2.beginPath();c2.moveTo(xs.getPixelForValue(DIR_Q_R24),ca.top);c2.lineTo(xs.getPixelForValue(DIR_Q_R24),ca.bottom);c2.stroke();
+      c2.beginPath();c2.moveTo(ca.left,ys.getPixelForValue(DIR_Q_1Q));c2.lineTo(ca.right,ys.getPixelForValue(DIR_Q_1Q));c2.stroke();
+      c2.strokeStyle="rgba(0,0,0,.15)";
+      c2.beginPath();c2.moveTo(xs.getPixelForValue(1.0),ca.top);c2.lineTo(xs.getPixelForValue(1.0),ca.bottom);c2.stroke();
+      c2.beginPath();c2.moveTo(ca.left,ys.getPixelForValue(1.0));c2.lineTo(ca.right,ys.getPixelForValue(1.0));c2.stroke();
+      c2.setLineDash([]); c2.restore();};
+    setTimeout(function(){ch.draw();},50);
+    if(!tabChartsQ["s1"]) tabChartsQ["s1"]=[];
+    tabChartsQ["s1"].push(ch);
+  },160+i*40);})(s,idx);
+});
+
+/* ④ 분기탭 — 전체 vs 2040 소형 복합차트 (qsg0) — 동일 Y축 — PS&M 9개 매장만 */
+var globalMaxT=Math.max.apply(null,stores.map(function(s){return Math.max.apply(null,s.tot_m);}));
+var globalMaxA=Math.max.apply(null,stores.map(function(s){return Math.max.apply(null,s.a40_m);}));
+
+stores.forEach(function(s,idx){
+  var w0=document.createElement("div"); w0.className="sm";
+  var t46=s.tot_m[2]-s.tot_m[0], a46=s.a40_m[2]-s.a40_m[0];
+  var sig="",sc="";
+  if(t46>0&&a46>0){sig="4→6 전체·2040↑";sc="#3B6D11";}
+  else if(t46>0&&a46<0){sig="4→6 전체↑ 2040↓";sc="#854F0B";}
+  else if(t46<0&&a46>0){sig="4→6 전체↓ 2040↑";sc="#3B6D11";}
+  else{sig="4→6 전체·2040↓";sc="#A32D2D";}
+  w0.innerHTML="<div class='sm-hd'>"
+    +"<span class='sm-name' style='font-size:11px;font-weight:700;'>"+s.n+"</span>"
+    +"<span class='sm-sig' style='color:"+sc+";'>"+sig+"</span></div>"
+    +"<div style='position:relative;height:100px;overflow:hidden;'><canvas id='qs0_"+idx+"'></canvas></div>"
+    +"<div style='display:flex;justify-content:space-between;font-size:11px;color:#aaa;margin-top:3px;'><span>4월</span><span>5월</span><span>6월</span></div>";
+  var el=document.getElementById("qsg0"); if(el) el.appendChild(w0);
+  (function(s,i){setTimeout(function(){
+    var el=document.getElementById("qs0_"+i); if(!el) return;
+    var ch=new Chart(el.getContext("2d"),{type:"bar",data:{labels:["4월","5월","6월"],datasets:[
+      {type:"bar",label:"전체",data:s.tot_m,backgroundColor:["rgba(56,138,221,.28)","rgba(56,138,221,.48)","rgba(56,138,221,.68)"],borderRadius:3,order:2,yAxisID:"y"},
+      {type:"line",label:"2040",data:s.a40_m,borderColor:"#D85A30",backgroundColor:"rgba(216,90,48,.08)",pointRadius:4,pointBackgroundColor:"#D85A30",tension:.3,borderWidth:2,order:1,yAxisID:"y"}
+    ]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16,right:4,left:4,bottom:0}},
+      plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false,callbacks:{label:function(c){return c.dataset.label+": "+c.parsed.y+"명";}}},
+        customLbl:{totM:s.tot_m,a40M:s.a40_m}},
+      scales:{x:{display:false},y:{display:false,min:0,max:globalMaxT*1.18}}}});
+    if(!tabChartsQ["s0"]) tabChartsQ["s0"]=[];
+    tabChartsQ["s0"].push(ch);
+  },100+i*40);})(s,idx);
+});
+
+
+
+/* ⑤ 분기탭 — 유형분류 테이블 (분기합산, 24평균比+1Q比) */
+var qAvgRows="<tr style='background:#f0f4f8;font-weight:500;'>"
+  +"<td style='font-size:13px;font-weight:600;'>직영 평균</td>"
+  +"<td><span style='background:#555;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;'>직영</span></td>"
+  +"<td style='text-align:center;font-weight:600;'>180명</td>"
+  +"<td style='text-align:center;'><span class='pill py'>87.4%</span></td>"
+  +"<td style='text-align:center;'><span class='pill pr'>75.6%</span></td></tr>";
+var qTypeTb=document.getElementById("q-type-tbody");
+if(qTypeTb) qTypeTb.innerHTML=qAvgRows+stores.map(function(s){
+  var qType = (s.q_r24>=1.0 && s.q_1q>=1.0) ? "우수" : (s.q_r24>=1.0 ? "24년 대비 성장" : "성장X");
+  var ts=TS[qType]||TS["회복 필요"];
+  var qr24c=s.q_r24>=0.8742?"pg":s.q_r24>=0.8242?"py":"pr";
+  var q1qc=s.q_1q>=0.7556?"pg":s.q_1q>=0.7056?"py":"pr";
+  return "<tr><td style='font-size:13px;font-weight:600;'>"+s.n+"</td><td><span class='tb "+ts.cls+"'>"+qType+"</span></td>"
+    +"<td style='text-align:center;font-size:13px;font-weight:600;'>"+Math.round(s.q_a40)+"명</td>"
+    +"<td style='text-align:center;'><span class='pill "+qr24c+"'>"+fmt(s.q_r24)+"</span></td>"
+    +"<td style='text-align:center;'><span class='pill "+q1qc+"'>"+fmt(s.q_1q)+"</span></td></tr>";
+}).join("");
+
+/* ⑤ 분기탭 — 연령대별 내방 구성 차트 (4~6월 합산) */
+setTimeout(function(){
+  var el=document.getElementById("q-agechart"); return; // 정적 SVG 사용
+  // 4~6월 평균값 = (4월+5월+6월)/3, 반올림
+  function agAvg(d,key){return Math.round((d.m4[key]+d.m5[key]+d.m6[key])/3);}
+  // stores 순서 보장
+  var agStores=stores.concat(skt);
+  new Chart(el.getContext("2d"),{type:"bar",data:{
+    labels:agStores.map(function(s){return s.n;}), // 풀네임
+    datasets:[
+      {label:"10대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age10");}),backgroundColor:"#C5DFC5",stack:"a"},
+      {label:"20대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age20");}),backgroundColor:"#AECDE8",stack:"a"},
+      {label:"30대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age30");}),backgroundColor:"#A8C8B8",stack:"a"},
+      {label:"40대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age40");}),backgroundColor:"#E8B4A0",stack:"a"},
+      {label:"50대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age50");}),backgroundColor:"#C4B4D4",stack:"a"},
+      {label:"60대",data:agStores.map(function(s){return agAvg(ageData[s.n],"age60");}),backgroundColor:"#B8B8B8",stack:"a"}
+    ]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    layout:{padding:{right:8,top:4}},
+    plugins:{
+      legend:{display:true,position:"top",labels:{boxWidth:10,font:{size:11},padding:8}},
+      tooltip:{
+        mode:"index",intersect:false,
+        callbacks:{
+          title:function(items){var lb=items[0].label; return lb||"(매장명 없음)";}, // 매장명 풀네임
+          label:function(c){
+            return c.dataset.label+": "+Math.round(c.parsed.x)+"명";
+          },
+          afterBody:function(items){
+            var total=items.reduce(function(s,c){return s+c.parsed.x;},0);
+            return ["─────","2040 합계: "+Math.round(items.filter(function(c){
+              return c.dataset.label==="20대"||c.dataset.label==="30대"||c.dataset.label==="40대";
+            }).reduce(function(s,c){return s+c.parsed.x;},0))+"명","전체 합계: "+Math.round(total)+"명"];
+          }
+        }
+      }
+    },
+    scales:{
+      x:{stacked:true,grid:{color:gc,lineWidth:.5},ticks:{color:tc,font:{size:11}},
+         title:{display:true,text:"4~6월 월평균 (명)",color:tc,font:{size:11}}},
+      y:{stacked:true,grid:{display:false},ticks:{color:"#333",font:{size:11,weight:"500"},padding:6},maxBarThickness:26}
+    }}});
+},280);
+
+/* ⑥ 분기탭 — 참고도표 (분기합산, 24평균比+1Q比만) */
+var refRowsQ=[];
+refRowsQ.push({g:"dir",label:"직영 평균",gTag:"<span style='background:#555;color:#fff;font-size:10px;padding:1px 5px;border-radius:3px;'>직영</span>",qa:180.4,qt:575.0,a_r24:0.8742,a_1q:0.7556,t_r24:1.0377,t_1q:0.8261});
+refRowsQ.push({g:"avg",label:"2040 특화매장(31店) 평균",gTag:"<span style='font-size:10px;color:#888;'>전체</span>",qa:330.2,qt:863.1,a_r24:0.9675,a_1q:0.7721,t_r24:1.1028,t_1q:0.8159});
+refRowsQ.push({g:"avg",label:"PS&M 9店 평균",gTag:"<span style='background:#1a1a1a;color:#fff;font-size:10px;padding:1px 5px;border-radius:3px;'>PS</span>",qa:287.4,qt:819.3,a_r24:0.9478,a_1q:0.7642,t_r24:1.0997,t_1q:0.8349});
+refRowsQ.push({g:"avg",label:"SKT 선정 매장(22店) 평균",gTag:"<span style='background:#e8e8e6;color:#888;font-size:10px;padding:1px 5px;border-radius:3px;'>SKT</span>",qa:345.4,qt:881.0,a_r24:0.9679,a_1q:0.7696,t_r24:1.1040,t_1q:0.8089});
+stores.forEach(function(s){
+  var qType=(s.q_r24>=1.0&&s.q_1q>=1.0)?"우수":(s.q_r24>=1.0?"24년 대비 성장":"성장X");
+  var ts=TS[qType]||TS["회복 필요"];
+  refRowsQ.push({g:"psm",label:s.n,gTag:"<span class='tb "+ts.cls+"' style='font-size:10px;min-width:64px;'>"+qType+"</span>",
+    qa:s.q_a40,qt:s.q_tot,a_r24:s.q_r24,a_1q:s.q_1q,t_r24:s.t_q_r24,t_1q:s.t_q_1q});
+});
+skt.forEach(function(s){
+  refRowsQ.push({g:"skt",label:s.n,gTag:"<span style='background:#e8e8e6;color:#aaa;font-size:10px;padding:1px 5px;border-radius:3px;'>SKT</span>",
+    qa:s.qa,qt:s.qt,a_r24:s.a_q_r24,a_1q:s.a_q_1q,t_r24:s.t_q_r24,t_1q:s.t_q_1q});
+});
+var sortKeyQ="label",sortAscQ=true;
+function blackTdQ(v){return "<td style='color:#111;font-weight:700;'>"+v+"</td>";}
+function renderRefQ(){
+  var fixed=refRowsQ.filter(function(r){return r.g!=="psm"&&r.g!=="skt";});
+  var psm=refRowsQ.filter(function(r){return r.g==="psm";});
+  var sk=refRowsQ.filter(function(r){return r.g==="skt";});
+  function srt(arr){return arr.sort(function(a,b){var av=a[sortKeyQ],bv=b[sortKeyQ];if(typeof av==="number"&&typeof bv==="number") return sortAscQ?av-bv:bv-av;return sortAscQ?(av+"").localeCompare(bv+""):(bv+"").localeCompare(av+"");});}
+  var ordered=fixed.concat(srt(psm)).concat(srt(sk));
+  var tbl=document.getElementById("q-ref-table");
+  if(!tbl) return;
+  function sh(k,l){return "<th class='ref-sort"+(k==="tl"?" tl":"")+"' onclick='setSortQ(\""+k+"\")' style='font-size:12px;'>"+l+(sortKeyQ===k?(sortAscQ?" ▲":" ▼"):"")+"</th>";}
+  var colN=8;
+  var h="<thead><tr>"+sh("label","매장")+"<th style='font-size:12px;'>구분</th>"
+    +"<th colspan='3' style='border-left:1px solid #ddd;color:#378ADD;font-size:12px;'>전체 내방 (4~6월 합계)</th>"
+    +"<th colspan='3' style='border-left:1px solid #ddd;color:#D85A30;font-size:12px;'>2040 내방 (4~6월 합계)</th>"
+    +"</tr><tr><th class='tl'></th><th></th>"
+    +sh("qt","평균(명)")+"<th style='font-size:12px;'>24평균比</th><th style='font-size:12px;'>1Q比</th>"
+    +sh("qa","평균(명)")+"<th style='font-size:12px;'>24평균比</th><th style='font-size:12px;'>1Q比</th>"
+    +"</tr></thead><tbody>";
+  var psmDone=false,sktDone=false;
+  ordered.forEach(function(r){
+    if(r.g==="psm"&&!psmDone){h+="<tr><td colspan='"+colN+"' style='padding:5px 9px;font-size:12px;font-weight:700;color:#1D9E75;background:#f0f8f4;border-top:1.5px solid #c8e8d8;'>▼ PS&amp;M 선정 매장 (9店)</td></tr>";psmDone=true;}
+    if(r.g==="skt"&&!sktDone){h+="<tr><td colspan='"+colN+"' style='padding:5px 9px;font-size:11px;font-weight:600;color:#aaa;background:#f8f8f6;border-top:1.5px solid #e0e0e0;'>▼ SKT 선정 매장 (22店) — 4~6월 평균 기준</td></tr>";sktDone=true;}
+    var rc=r.g==="avg"?"avg-r":r.g==="dir"?"dir-r":r.g==="psm"?"psm-r":"";
+    var nc=r.g==="skt"?"nc-skt":"nc";
+    var isSummary=(r.g==="avg"||r.g==="dir");
+    h+="<tr class='"+rc+"'><td class='"+nc+"' style='font-size:13px;"+(isSummary?"color:#111;font-weight:700;":"")+"'>"+r.label+"</td><td>"+r.gTag+"</td>"
+      +"<td style='border-left:1px solid #f0f0f0;font-size:13px;"+(isSummary?"color:#111;font-weight:700;":"")+"'>"+(r.qt==="-"?"-":Math.round(r.qt))+"</td>"
+      +(isSummary?blackTdQ(f2(r.t_r24))+blackTdQ(f2(r.t_1q)):rcTd(f2(r.t_r24),1.0984)+rcTd(f2(r.t_1q),0.8268))
+      +"<td style='border-left:1px solid #f0f0f0;font-size:13px;"+(isSummary?"color:#111;font-weight:700;":"")+"'>"+(r.qa==="-"?"-":Math.round(r.qa))+"</td>"
+      +(isSummary?blackTdQ(f2(r.a_r24))+blackTdQ(f2(r.a_1q)):rcTd(f2(r.a_r24),0.8742)+rcTd(f2(r.a_1q),0.7556))+"</tr>";
+  });
+  tbl.innerHTML=h+"</tbody>";
+}
+function setSortQ(k){if(sortKeyQ===k){sortAscQ=!sortAscQ;}else{sortKeyQ=k;sortAscQ=false;}renderRefQ();}
+renderRefQ();
+
+
+
+/* ── ③-0 소형 복합 차트 ── */
+
+/* ══════ 탭 전환 ══════ */
+
+/* ── 심층진단 편집 ── */
+var currentEditId=null;
+function openEditModal(diagId, storeName){
+  currentEditId=diagId;
+  var textEl=document.getElementById("diagText_"+diagId.replace("diag_",""));
+  document.getElementById("editTextarea").value=textEl?textEl.innerHTML.replace(/<[^>]*>/g,""):"";
+  document.getElementById("editModalLabel").textContent=storeName+" — 심층 진단 수정";
+  document.getElementById("editModal").classList.add("open");
+}
+function closeEditModal(){
+  document.getElementById("editModal").classList.remove("open");
+  currentEditId=null;
+}
+function saveEdit(){
+  if(!currentEditId) return;
+  var idx=currentEditId.replace("diag_","");
+  var textEl=document.getElementById("diagText_"+idx);
+  var newVal=document.getElementById("editTextarea").value;
+  if(textEl) textEl.innerHTML=newVal;
+  try{localStorage.setItem("diag_"+idx, newVal);}catch(e){}
+  closeEditModal();
+}
+// 저장된 내용 복원
+(function(){
+  try{
+    for(var i=0;i<20;i++){
+      var saved=localStorage.getItem("diag_"+i);
+      var el=document.getElementById("diagText_"+i);
+      if(saved&&el) el.innerHTML=saved;
+    }
+  }catch(e){}
+})();
+document.getElementById("editModal").addEventListener("click",function(e){
+  if(e.target===this) closeEditModal();
+});
+
+/* ── ① 히트맵 차트 ── */
+
+/* ══ ①구간 히트맵 + 추이 (SVG 방식, 타이밍 무관) ══ */
+function drawQCharts(){return; // 정적 SVG 사용 중 //
+  var hmEl=document.getElementById("q-heatmap");
+  var trEl=document.getElementById("q-trend");
+  if(!hmEl||!trEl) return;
+
+  var sdata=stores.concat(skt).map(function(s){
+    return {name:s.n, r24:Math.round(s.q_r24*1000)/10, r1q:Math.round(s.q_1q*1000)/10};
+  });
+
+  /* ─ 히트맵 ─ */
+  (function(){
+    // 고정 viewBox 사용 — width=100% SVG이므로 W는 논리 좌표
+    var W=700, pad={t:22,r:120,b:40,l:8};
+    var rows=sdata.length, rowH=Math.floor((230-pad.t-pad.b)/rows);
+    var H=rowH*rows+pad.t+pad.b;
+    var xMin=40,xMax=160;
+    function px(v){return pad.l+(v-xMin)/(xMax-xMin)*(W-pad.l-pad.r);}
+    function hcR24(v){
+      if(v>=100) return "#1D9E75";
+      if(v>=87.4) return "#7DC4A8";
+      if(v>=75.6) return "#E8D88A";
+      return "#E89090";
+    }
+    function hcR1Q(v){
+      if(v>=90) return "#1D9E75";
+      if(v>=75.6) return "#7DC4A8";
+      if(v>=65) return "#E8D88A";
+      return "#E89090";
+    }
+    var svgParts=["<svg xmlns='http://www.w3.org/2000/svg' width='100%' viewBox='0 0 700 "+H+"' preserveAspectRatio='none' style='font-family:sans-serif;display:block;'>"];
+    // x축 눈금선
+    [50,60,70,80,87.4,90,100,110,120,130,140].forEach(function(v){
+      var x=px(v);
+      svgParts.push("<line x1='"+x+"' y1='"+pad.t+"' x2='"+x+"' y2='"+(H-pad.b)+"' stroke='"+(v===87.4?"rgba(29,158,117,.6)":v===100?"rgba(0,0,0,.12)":"rgba(0,0,0,.05)")+"' stroke-width='"+(v===87.4?1.8:1)+"' stroke-dasharray='"+(v===87.4?"5,3":v===100?"3,3":"")+"'/>");
+      if(v===87.4||v===100||v%20===0){
+        svgParts.push("<text x='"+x+"' y='"+(H-pad.b+12)+"' text-anchor='middle' font-size='8.5' fill='"+(v===87.4?"rgba(29,158,117,.9)":"#aaa")+"'>"+v+"%</text>");
+      }
+    });
+    // 막대
+    sdata.forEach(function(d,i){
+      var y=pad.t+i*rowH;
+      var bH=Math.floor(rowH*0.38);
+      // 24比
+      var x24=px(d.r24), x0=px(Math.min(d.r24,xMin));
+      var w24=Math.abs(px(d.r24)-px(xMin));
+      svgParts.push("<rect x='"+px(xMin)+"' y='"+(y+2)+"' width='"+w24+"' height='"+bH+"' rx='2' fill='"+hcR24(d.r24)+"' opacity='.85'/>");
+      svgParts.push("<text x='"+(x24+4)+"' y='"+(y+2+bH*0.78)+"' font-size='9' font-weight='700' fill='#444'>"+d.r24+"%</text>");
+      // 1Q比
+      var w1q=Math.abs(px(d.r1q)-px(xMin));
+      svgParts.push("<rect x='"+px(xMin)+"' y='"+(y+2+bH+2)+"' width='"+w1q+"' height='"+bH+"' rx='2' fill='"+hcR1Q(d.r1q)+"' opacity='.7'/>");
+      svgParts.push("<text x='"+(px(d.r1q)+4)+"' y='"+(y+2+bH+2+bH*0.78)+"' font-size='8' fill='#666'>"+d.r1q+"%</text>");
+      // 매장명
+      svgParts.push("<text x='"+(W-pad.r+4)+"' y='"+(y+rowH/2+4)+"' font-size='9.5' fill='#333' font-weight='600'>"+d.name+"</text>");
+    });
+    // 직영 기준선 라벨
+    var bx=px(87.4);
+    svgParts.push("<text x='"+bx+"' y='"+(H-6)+"' text-anchor='middle' font-size='8' fill='rgba(29,158,117,.9)' font-weight='700'>직영 기준 100%</text>");
+    // 범례
+    svgParts.push("<rect x='"+(pad.l)+"' y='4' width='10' height='7' rx='1' fill='#7DC4A8'/><text x='"+(pad.l+13)+"' y='11' font-size='9' fill='#555'>24년 평균比</text>");
+    svgParts.push("<rect x='"+(pad.l+85)+"' y='4' width='10' height='7' rx='1' fill='#7DC4A8' opacity='.7'/><text x='"+(pad.l+98)+"' y='11' font-size='9' fill='#888'>1Q比</text>");
+    svgParts.push("</svg>");
+    hmEl.innerHTML=svgParts.join("");
+  })();
+
+  /* ─ 추이 꺾은선 ─ */
+  (function(){
+    var W=700; var pad={t:16,r:110,b:28,l:38};
+    var iW=W-pad.l-pad.r, iH=230-pad.t-pad.b;
+    var months=["4월","5월","6월"];
+    var palette=["#1D9E75","#4A90D9","#E8774A","#9B7FBF","#E8A800","#D85A30","#3AABCA","#60A898","#909090"];
+    var storeNames=["김포고촌역점","탕정점","배곧신도시점","수완장덕점","서면롯데점","다사점","신림역점","춘천명동점","청라점"];
+
+    // 전체 min/max
+    var allVals=[];
+    stores.forEach(function(s){ s.a40_m.forEach(function(v){allVals.push(v);}); });
+    var vMin=Math.max(0,Math.min.apply(null,allVals)*0.85);
+    var vMax=Math.max.apply(null,allVals)*1.08;
+
+    function xp(i){return pad.l+i*(iW/2);}
+    function yp(v){return pad.t+iH-(v-vMin)/(vMax-vMin)*iH;}
+
+    var svgParts=["<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='220' viewBox='0 0 700 220' preserveAspectRatio='none' style='font-family:sans-serif;display:block;'>"];
+
+    // y축 격자
+    var yTicks=4;
+    for(var t=0;t<=yTicks;t++){
+      var v=vMin+(vMax-vMin)*t/yTicks;
+      var y=yp(v);
+      svgParts.push("<line x1='"+pad.l+"' y1='"+y+"' x2='"+(W-pad.r)+"' y2='"+y+"' stroke='rgba(0,0,0,.07)' stroke-width='1'/>");
+      svgParts.push("<text x='"+(pad.l-4)+"' y='"+(y+4)+"' text-anchor='end' font-size='8.5' fill='#bbb'>"+Math.round(v)+"</text>");
+    }
+    // x축 라벨
+    months.forEach(function(m,i){
+      svgParts.push("<text x='"+xp(i)+"' y='"+(230-8)+"' text-anchor='middle' font-size='10' fill='#666'>"+m+"</text>");
+    });
+
+    // 각 매장 선
+    stores.forEach(function(s,si){
+      var vals=s.a40_m.map(function(v){return Math.round(v);});
+      var color=palette[si];
+      var pts=vals.map(function(v,i){return xp(i)+","+yp(v);}).join(" ");
+
+      // 선
+      svgParts.push("<polyline points='"+pts+"' fill='none' stroke='"+color+"' stroke-width='2' stroke-linejoin='round'/>");
+      // 점
+      vals.forEach(function(v,i){
+        svgParts.push("<circle cx='"+xp(i)+"' cy='"+yp(v)+"' r='3.5' fill='"+color+"' stroke='#fff' stroke-width='1.5'/>");
+      });
+      // 6월 끝 라벨 (겹침 방지 나중에)
+      svgParts.push("<text data-y='"+yp(vals[2])+"' x='"+(xp(2)+8)+"' y='"+(yp(vals[2])+4)+"' font-size='9.5' font-weight='700' fill='"+color+"'>"+storeNames[si]+" "+vals[2]+"</text>");
+    });
+
+    svgParts.push("</svg>");
+    trEl.innerHTML=svgParts.join("");
+
+    // 겹침 방지 — 라벨 y 조정
+    var labels=trEl.querySelectorAll("text[data-y]");
+    var sorted=Array.from(labels).sort(function(a,b){return parseFloat(a.getAttribute("data-y"))-parseFloat(b.getAttribute("data-y"));});
+    var minGap=13;
+    sorted.forEach(function(el,i){
+      if(i===0) return;
+      var prev=sorted[i-1];
+      var py=parseFloat(prev.getAttribute("y"));
+      var cy=parseFloat(el.getAttribute("y"));
+      if(cy-py<minGap) el.setAttribute("y",py+minGap);
+    });
+  })();
+}
+
+// 페이지 로드 시 바로 실행 (DOM 준비 후)
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",function(){setTimeout(drawQCharts,100);});
+} else {
+  setTimeout(drawQCharts,100);
+}
+window.onload=function(){
+  setTimeout(drawQCharts,200);
+};
+// ResizeObserver: div 크기 확정 시 즉시 그리기
+(function(){
+  var hmEl=document.getElementById("q-heatmap");
+  if(!hmEl) return;
+  if(typeof ResizeObserver!=="undefined"){
+    var drawn=false;
+    var ro=new ResizeObserver(function(entries){
+      for(var e of entries){
+        if(e.contentRect.width>50&&!drawn){
+          drawn=true;
+          drawQCharts();
+        }
+      }
+    });
+    ro.observe(hmEl);
+  }
+})();
+// 창 크기 변경 시 재그리기
+window.addEventListener("resize",function(){
+  var el=document.getElementById("q-heatmap");
+  if(el&&el.offsetParent!==null) drawQCharts();
+});
+
+
+/* ── 인라인 편집 ── */
+function toggleInlineEdit(idx){
+  var span=document.getElementById("diagText_"+idx);
+  var ta=document.getElementById("diagTA_"+idx);
+  var saveDiv=document.getElementById("diagSave_"+idx);
+  var btn=document.getElementById("ebtn_"+idx);
+  if(!ta) return;
+  var isEditing=ta.style.display!=="none";
+  if(isEditing){cancelInline(idx);return;}
+  ta.value=span.innerHTML.replace(/<strong>/g,"").replace(/<\/strong>/g,"");
+  ta.style.display="block";
+  saveDiv.style.display="flex";
+  span.style.display="none";
+  btn.innerHTML="<span style='margin-right:3px;'>✖</span>닫기";
+  ta.focus();
+}
+function saveInline(idx){
+  var span=document.getElementById("diagText_"+idx);
+  var ta=document.getElementById("diagTA_"+idx);
+  var saveDiv=document.getElementById("diagSave_"+idx);
+  var btn=document.getElementById("ebtn_"+idx);
+  if(!ta||!span) return;
+  span.innerHTML=ta.value;
+  try{localStorage.setItem("diag_"+idx,ta.value);}catch(e){}
+  ta.style.display="none";
+  saveDiv.style.display="none";
+  span.style.display="inline";
+  btn.innerHTML="<span style='margin-right:3px;'>✏️</span>수정";
+}
+function cancelInline(idx){
+  var span=document.getElementById("diagText_"+idx);
+  var ta=document.getElementById("diagTA_"+idx);
+  var saveDiv=document.getElementById("diagSave_"+idx);
+  var btn=document.getElementById("ebtn_"+idx);
+  if(!ta) return;
+  ta.style.display="none";
+  saveDiv.style.display="none";
+  span.style.display="inline";
+  btn.innerHTML="<span style='margin-right:3px;'>✏️</span>수정";
+}
+function swTopTab(idx,btn){
+  document.querySelectorAll(".top-tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.querySelectorAll(".top-tab-panel").forEach(function(p){p.classList.remove("active");});
+  btn.classList.add("active");
+  document.getElementById("ttp"+idx).classList.add("active");
+  if(idx===0){setTimeout(drawQCharts,60);}
+  if(idx===1){
+    if(tabChartsM["t1"]) tabChartsM["t1"].forEach(function(c){c.resize();});
+  }
+  if(idx===0){
+    if(tabChartsQ["s0"]) tabChartsQ["s0"].forEach(function(c){c.resize();});
+    if(tabChartsQ["s1"]) tabChartsQ["s1"].forEach(function(c){c.resize();});
+  }
+}
+function swTab(prefix,idx,btn){
+  var panels=btn.closest(".card").querySelectorAll(".tab-panel");
+  var btns=btn.closest(".card").querySelectorAll(".tab-btn");
+  btns.forEach(function(b){b.classList.remove("active");});
+  panels.forEach(function(p){p.classList.remove("active");});
+  btn.classList.add("active");
+  panels[idx].classList.add("active");
+  if(prefix==="q"){
+    if(tabChartsQ["s"+idx]) tabChartsQ["s"+idx].forEach(function(c){c.resize();});
+  } else {
+    if(tabChartsM["t"+idx]) tabChartsM["t"+idx].forEach(function(c){c.resize();});
+  }
+}
+</script>
+
+<!-- 심층진단 편집 모달 -->
+<div class="edit-modal-overlay" id="editModal">
+  <div class="edit-modal">
+    <div class="edit-modal-title">💡 심층 진단 수정</div>
+    <div style="font-size:12px;color:#888;margin-bottom:10px;" id="editModalLabel">매장명</div>
+    <textarea id="editTextarea" placeholder="심층 진단 내용을 입력하세요..."></textarea>
+    <div class="edit-modal-btns">
+      <button class="edit-cancel" onclick="closeEditModal()">취소</button>
+      <button class="edit-save" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
